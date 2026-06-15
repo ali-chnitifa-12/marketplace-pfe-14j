@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => {
-      setUser(res.data);
+      setUser(res.data); // now includes role, isBanned
     })
     .catch(err => {
       console.error('Invalid token', err);
@@ -31,13 +31,15 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, motDePasse) => {
     const res = await axios.post('http://localhost:5000/api/auth/login', { email, motDePasse });
     localStorage.setItem('token', res.data.token);
-    setUser(res.data.user);
+    setUser(res.data.user); // includes role
+    return res.data.user;
   };
 
   const register = async (nom, email, motDePasse) => {
     const res = await axios.post('http://localhost:5000/api/auth/register', { nom, email, motDePasse });
     localStorage.setItem('token', res.data.token);
-    setUser(res.data.user);
+    setUser(res.data.user); // includes role
+    return res.data.user;
   };
 
   const logout = () => {
@@ -47,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

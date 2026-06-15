@@ -89,9 +89,10 @@ export default function Login() {
     setIsLoading(true);
     setError('');
     try {
-      await login(email, password);
+      const loggedUser = await login(email, password);
       gsap.to(cardRef.current, { scale: 1.05, opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' });
-      setTimeout(() => navigate('/'), 500);
+      const redirectPath = loggedUser.role === 'admin' ? '/admin' : '/';
+      setTimeout(() => navigate(redirectPath), 500);
     } catch (err) {
       setError(err.response?.data?.message || 'Identifiants invalides');
       gsap.fromTo(cardRef.current,

@@ -81,9 +81,10 @@ export default function Register() {
     setIsLoading(true);
     setError('');
     try {
-      await register(nom, email, password);
+      const newUser = await register(nom, email, password);
       gsap.to(cardRef.current, { scale: 1.05, opacity: 0, y: -20, duration: 0.5 });
-      setTimeout(() => navigate('/'), 500);
+      const redirectPath = newUser.role === 'admin' ? '/admin' : '/';
+      setTimeout(() => navigate(redirectPath), 500);
     } catch (err) {
       setError(err.response?.data?.message || "Erreur lors de l'inscription");
       gsap.fromTo(cardRef.current,
