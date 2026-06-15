@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 // ─── Register ──────────────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { nom, email, motDePasse } = req.body;
+    const { nom, email, motDePasse, typeCompte } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -34,6 +34,7 @@ router.post('/register', async (req, res) => {
       nom,
       email,
       motDePasse: hashedPassword,
+      typeCompte: typeCompte === 'vendeur' ? 'vendeur' : 'acheteur',
       // role defaults to 'user' via model definition
     });
 
@@ -45,7 +46,7 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({
       token,
-      user: { id: newUser.id, nom: newUser.nom, email: newUser.email, role: newUser.role }
+      user: { id: newUser.id, nom: newUser.nom, email: newUser.email, role: newUser.role, typeCompte: newUser.typeCompte }
     });
   } catch (err) {
     console.error(err);
@@ -81,7 +82,7 @@ router.post('/login', async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, nom: user.nom, email: user.email, role: user.role }
+      user: { id: user.id, nom: user.nom, email: user.email, role: user.role, typeCompte: user.typeCompte }
     });
   } catch (err) {
     console.error(err);
@@ -93,7 +94,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'nom', 'email', 'role', 'isBanned', 'photo', 'createdAt']
+      attributes: ['id', 'nom', 'email', 'role', 'typeCompte', 'isBanned', 'photo', 'createdAt']
     });
     if (!user) {
       return res.status(404).json({ message: 'Utilisateur introuvable.' });

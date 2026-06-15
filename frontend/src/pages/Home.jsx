@@ -176,6 +176,10 @@ export default function Home() {
           <h1 ref={nameRef} className="welcome-name">
             Bienvenue, <span className="name-gradient">{user?.nom || 'Utilisateur'}</span>
           </h1>
+          <div className="account-type-badge">
+            <span className="type-icon">{user?.typeCompte === 'vendeur' ? '🏷️' : '🛒'}</span>
+            Compte {user?.typeCompte === 'vendeur' ? 'Vendeur' : 'Acheteur'}
+          </div>
           <p ref={subtitleRef} className="welcome-subtitle">
             Ton espace personnel sur Marketplace PFE — explore, vends et achète en toute confiance
           </p>
@@ -371,6 +375,16 @@ export default function Home() {
           font-size: 15px; color: #64748b; max-width: 500px;
           margin: 0 auto; line-height: 1.7;
         }
+        
+        .account-type-badge {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          padding: 6px 16px; border-radius: 100px;
+          font-size: 13px; font-weight: 600; color: #cbd5e1;
+          margin-bottom: 24px;
+        }
+        .type-icon { font-size: 14px; }
 
         /* ─── Section Titles ─── */
         .section-title {

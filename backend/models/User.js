@@ -23,6 +23,11 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  typeCompte: {
+    type: DataTypes.ENUM('acheteur', 'vendeur'),
+    defaultValue: 'acheteur',
+    allowNull: false,
+  },
   role: {
     type: DataTypes.ENUM('user', 'admin'),
     defaultValue: 'user',

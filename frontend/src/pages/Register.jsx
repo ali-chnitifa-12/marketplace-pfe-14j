@@ -7,6 +7,7 @@ export default function Register() {
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [typeCompte, setTypeCompte] = useState('acheteur');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [focused, setFocused] = useState('');
@@ -81,7 +82,7 @@ export default function Register() {
     setIsLoading(true);
     setError('');
     try {
-      const newUser = await register(nom, email, password);
+      const newUser = await register(nom, email, password, typeCompte);
       gsap.to(cardRef.current, { scale: 1.05, opacity: 0, y: -20, duration: 0.5 });
       const redirectPath = newUser.role === 'admin' ? '/admin' : '/';
       setTimeout(() => navigate(redirectPath), 500);
@@ -196,6 +197,36 @@ export default function Register() {
             )}
           </div>
 
+          <div ref={addToFields} className="account-type-group">
+            <label>Type de compte</label>
+            <div className="segmented-control">
+              <input
+                type="radio"
+                name="typeCompte"
+                id="acheteur"
+                value="acheteur"
+                checked={typeCompte === 'acheteur'}
+                onChange={(e) => setTypeCompte(e.target.value)}
+              />
+              <label htmlFor="acheteur" className="segment-label">
+                <span className="segment-icon">🛒</span> Acheteur
+              </label>
+
+              <input
+                type="radio"
+                name="typeCompte"
+                id="vendeur"
+                value="vendeur"
+                checked={typeCompte === 'vendeur'}
+                onChange={(e) => setTypeCompte(e.target.value)}
+              />
+              <label htmlFor="vendeur" className="segment-label">
+                <span className="segment-icon">🏷️</span> Vendeur
+              </label>
+              <div className="segment-indicator" />
+            </div>
+          </div>
+
           <button ref={btnRef} type="submit" disabled={isLoading} className="submit-btn">
             {isLoading ? '⟳ Création...' : "S'inscrire gratuitement →"}
           </button>
@@ -278,6 +309,42 @@ export default function Register() {
         .strength-bar.medium { background: #f59e0b; width: 66%; }
         .strength-bar.strong { background: #34d399; width: 100%; }
         .strength-text { font-size: 11px; color: #64748b; white-space: nowrap; }
+
+        .account-type-group { margin-top: 4px; }
+        .account-type-group > label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+        .segmented-control {
+          display: flex; position: relative;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 12px; padding: 4px;
+        }
+        .segmented-control input[type="radio"] { display: none; }
+        .segment-label {
+          flex: 1; text-align: center; padding: 12px 8px;
+          font-size: 13px; font-weight: 600; color: #94a3b8;
+          cursor: pointer; position: relative; z-index: 2;
+          transition: color 0.3s;
+          display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .segment-icon { font-size: 16px; opacity: 0.6; transition: opacity 0.3s; }
+        .segmented-control input[type="radio"]:checked + .segment-label { color: #fff; }
+        .segmented-control input[type="radio"]:checked + .segment-label .segment-icon { opacity: 1; }
+        
+        .segment-indicator {
+          position: absolute; top: 4px; bottom: 4px; left: 4px;
+          width: calc(50% - 4px);
+          background: rgba(20,184,166,0.2);
+          border: 1px solid rgba(20,184,166,0.4);
+          border-radius: 8px; z-index: 1;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 2px 10px rgba(20,184,166,0.1);
+        }
+        #vendeur:checked ~ .segment-indicator {
+          transform: translateX(100%);
+          background: rgba(249,115,22,0.2);
+          border-color: rgba(249,115,22,0.4);
+          box-shadow: 0 2px 10px rgba(249,115,22,0.1);
+        }
 
         .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #14b8a6, #0d9488); border: none; border-radius: 14px; cursor: pointer; color: white; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; box-shadow: 0 4px 30px rgba(20,184,166,0.4), inset 0 1px 0 rgba(255,255,255,0.15); transition: transform 0.2s, box-shadow 0.2s; margin-top: 6px; }
         .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(20,184,166,0.55); }
