@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
-import { Mail, Lock, ArrowRight, Github } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Login() {
@@ -9,36 +8,81 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [focused, setFocused] = useState('');
+
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   const containerRef = useRef(null);
-  const formRef = useRef(null);
-  const imageRef = useRef(null);
+  const cardRef = useRef(null);
+  const titleRef = useRef(null);
+  const fieldsRef = useRef([]);
+  const btnRef = useRef(null);
+  const orb1Ref = useRef(null);
+  const orb2Ref = useRef(null);
+  const orb3Ref = useRef(null);
 
   useEffect(() => {
-    // Modern GSAP Animation
     const ctx = gsap.context(() => {
-      gsap.from(imageRef.current, {
-        x: -50,
-        opacity: 0,
-        duration: 1.2,
-        ease: 'power3.out'
+      // Orb floating animations
+      gsap.to(orb1Ref.current, {
+        x: 40, y: -30, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: -1
       });
-      
-      gsap.from(formRef.current.children, {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power2.out',
-        delay: 0.2
+      gsap.to(orb2Ref.current, {
+        x: -50, y: 40, duration: 5, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1
       });
+      gsap.to(orb3Ref.current, {
+        x: 30, y: 30, duration: 6, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2
+      });
+
+      // Card entrance
+      gsap.fromTo(cardRef.current,
+        { scale: 0.8, opacity: 0, rotationY: -15 },
+        { scale: 1, opacity: 1, rotationY: 0, duration: 1, ease: 'back.out(1.7)' }
+      );
+
+      // Title letter animation
+      gsap.fromTo(titleRef.current,
+        { y: -40, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, delay: 0.4, ease: 'power3.out' }
+      );
+
+      // Fields stagger
+      gsap.fromTo(fieldsRef.current,
+        { x: -40, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.6, stagger: 0.12, delay: 0.6, ease: 'power2.out' }
+      );
+
+      // Button pop
+      gsap.fromTo(btnRef.current,
+        { y: 30, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.6, delay: 1.1, ease: 'back.out(2)' }
+      );
     }, containerRef);
-    
+
     return () => ctx.revert();
   }, []);
+
+  const handleMouseMove = (e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    gsap.to(card, {
+      rotationY: x / 30,
+      rotationX: -y / 30,
+      duration: 0.5,
+      ease: 'power2.out',
+      transformPerspective: 1000,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    gsap.to(cardRef.current, {
+      rotationY: 0, rotationX: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)'
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,135 +90,256 @@ export default function Login() {
     setError('');
     try {
       await login(email, password);
-      navigate('/');
+      gsap.to(cardRef.current, { scale: 1.05, opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' });
+      setTimeout(() => navigate('/'), 500);
     } catch (err) {
       setError(err.response?.data?.message || 'Identifiants invalides');
-      
-      // Error shake animation
-      gsap.fromTo(formRef.current, 
-        { x: -10 }, 
-        { x: 10, duration: 0.1, yoyo: true, repeat: 5, ease: 'linear', onComplete: () => gsap.set(formRef.current, {x: 0}) }
+      gsap.fromTo(cardRef.current,
+        { x: -15 },
+        { x: 15, duration: 0.08, yoyo: true, repeat: 7, ease: 'linear', onComplete: () => gsap.set(cardRef.current, { x: 0 }) }
       );
     } finally {
       setIsLoading(false);
     }
   };
 
+  const addToFields = (el) => {
+    if (el && !fieldsRef.current.includes(el)) fieldsRef.current.push(el);
+  };
+
   return (
-    <div ref={containerRef} className="min-h-screen bg-brand-50 flex items-center justify-center p-4">
-      <div className="max-w-5xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
-        
-        {/* Left Side - Image/Branding */}
-        <div ref={imageRef} className="md:w-1/2 bg-brand-600 p-12 text-white flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10">
-            <svg className="absolute w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="none" />
-              <path d="M0,100 C20,50 80,50 100,0" stroke="white" strokeWidth="2" fill="none" />
-            </svg>
-          </div>
-          
-          <div className="relative z-10">
-            <h1 className="text-4xl font-bold mb-2">Marketplace PFE</h1>
-            <p className="text-brand-100 text-lg">La meilleure plateforme pour vendre et acheter vos objets d'occasion en toute sécurité.</p>
-          </div>
-          
-          <div className="relative z-10 mt-12 md:mt-0">
-            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
-              <p className="italic font-light">"Une expérience fluide et sécurisée. Le Pay on Delivery m'a donné confiance."</p>
-              <div className="mt-4 flex items-center">
-                <div className="w-10 h-10 bg-brand-500 rounded-full flex items-center justify-center font-bold text-lg">A</div>
-                <div className="ml-3">
-                  <p className="font-semibold text-sm">Amine B.</p>
-                  <p className="text-brand-100 text-xs">Vendeur vérifié</p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div
+      ref={containerRef}
+      className="login-page"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Animated background orbs */}
+      <div ref={orb1Ref} className="orb orb-1" />
+      <div ref={orb2Ref} className="orb orb-2" />
+      <div ref={orb3Ref} className="orb orb-3" />
+
+      {/* Grid lines background */}
+      <div className="grid-bg" />
+
+      <div ref={cardRef} className="glass-card">
+        {/* Logo */}
+        <div ref={addToFields} className="logo-area">
+          <div className="logo-icon">🛒</div>
+          <span className="logo-text">Marketplace PFE</span>
         </div>
 
-        {/* Right Side - Form */}
-        <div className="md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white">
-          <div ref={formRef} className="max-w-md w-full mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900">Bon retour ! 👋</h2>
-              <p className="text-slate-500 mt-2">Veuillez entrer vos identifiants pour continuer.</p>
-            </div>
+        <div ref={titleRef} className="card-title-area">
+          <h1 className="card-title">Content de te revoir</h1>
+          <p className="card-subtitle">Connecte-toi pour continuer ton aventure</p>
+        </div>
 
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
-                {error}
-              </div>
-            )}
+        {error && (
+          <div ref={addToFields} className="error-box">
+            ⚠️ {error}
+          </div>
+        )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-slate-400" />
-                  </div>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
-                    placeholder="vous@email.com"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Mot de passe</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-slate-400" />
-                  </div>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input id="remember-me" type="checkbox" className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded" />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-600">Se souvenir de moi</label>
-                </div>
-                <div className="text-sm">
-                  <a href="#" className="font-medium text-brand-600 hover:text-brand-500">Mot de passe oublié ?</a>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all disabled:opacity-70"
-              >
-                {isLoading ? (
-                  <span className="flex items-center">Chargement...</span>
-                ) : (
-                  <span className="flex items-center">Se connecter <ArrowRight className="ml-2 h-4 w-4" /></span>
-                )}
-              </button>
-            </form>
-
-            <div className="mt-8 text-center">
-              <p className="text-sm text-slate-600">
-                Vous n'avez pas de compte ?{' '}
-                <Link to="/register" className="font-bold text-brand-600 hover:text-brand-500 transition-colors">
-                  S'inscrire
-                </Link>
-              </p>
+        <form onSubmit={handleSubmit} className="form-area">
+          <div ref={addToFields} className={`input-group ${focused === 'email' ? 'focused' : ''}`}>
+            <label>Email</label>
+            <div className="input-wrapper">
+              <span className="input-icon">✉️</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocused('email')}
+                onBlur={() => setFocused('')}
+                placeholder="vous@email.com"
+                required
+              />
             </div>
           </div>
+
+          <div ref={addToFields} className={`input-group ${focused === 'password' ? 'focused' : ''}`}>
+            <label>Mot de passe</label>
+            <div className="input-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocused('password')}
+                onBlur={() => setFocused('')}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </div>
+
+          <div ref={addToFields} className="forgot-row">
+            <a href="#" className="forgot-link">Mot de passe oublié ?</a>
+          </div>
+
+          <button ref={btnRef} type="submit" disabled={isLoading} className="submit-btn">
+            {isLoading ? (
+              <span className="loading-spinner">⟳ Connexion...</span>
+            ) : (
+              <span>Se connecter →</span>
+            )}
+          </button>
+        </form>
+
+        <div ref={addToFields} className="switch-auth">
+          Pas de compte ?{' '}
+          <Link to="/register" className="switch-link">Inscris-toi gratuitement</Link>
         </div>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .login-page {
+          min-height: 100vh;
+          background: #050816;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Inter', sans-serif;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .grid-bg {
+          position: fixed; inset: 0;
+          background-image:
+            linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
+          background-size: 50px 50px;
+          pointer-events: none;
+        }
+
+        .orb {
+          position: fixed; border-radius: 50%;
+          filter: blur(80px); pointer-events: none; z-index: 0;
+        }
+        .orb-1 {
+          width: 500px; height: 500px;
+          background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%);
+          top: -100px; left: -100px;
+        }
+        .orb-2 {
+          width: 400px; height: 400px;
+          background: radial-gradient(circle, rgba(6,182,212,0.25) 0%, transparent 70%);
+          bottom: -80px; right: -60px;
+        }
+        .orb-3 {
+          width: 300px; height: 300px;
+          background: radial-gradient(circle, rgba(251,113,133,0.2) 0%, transparent 70%);
+          top: 50%; left: 60%;
+        }
+
+        .glass-card {
+          position: relative; z-index: 10;
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 28px;
+          padding: 48px;
+          width: 100%; max-width: 460px;
+          box-shadow:
+            0 0 0 1px rgba(124,58,237,0.15),
+            0 25px 80px rgba(0,0,0,0.5),
+            inset 0 1px 0 rgba(255,255,255,0.07);
+          transform-style: preserve-3d;
+        }
+
+        .logo-area {
+          display: flex; align-items: center; gap: 10px; margin-bottom: 32px;
+        }
+        .logo-icon { font-size: 28px; }
+        .logo-text {
+          font-size: 17px; font-weight: 700;
+          background: linear-gradient(135deg, #a78bfa, #38bdf8);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .card-title-area { margin-bottom: 32px; }
+        .card-title {
+          font-size: 30px; font-weight: 800; color: #f1f5f9; line-height: 1.2;
+        }
+        .card-subtitle { font-size: 14px; color: #64748b; margin-top: 6px; }
+
+        .error-box {
+          background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+          color: #fca5a5; border-radius: 12px; padding: 12px 16px;
+          font-size: 13px; margin-bottom: 20px;
+        }
+
+        .form-area { display: flex; flex-direction: column; gap: 20px; }
+
+        .input-group label {
+          display: block; font-size: 12px; font-weight: 600;
+          color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em;
+          margin-bottom: 8px;
+        }
+        .input-wrapper {
+          display: flex; align-items: center; position: relative;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 14px; overflow: hidden;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-group.focused .input-wrapper {
+          border-color: rgba(124,58,237,0.6);
+          box-shadow: 0 0 0 3px rgba(124,58,237,0.12), 0 0 20px rgba(124,58,237,0.1);
+        }
+        .input-icon {
+          padding: 14px 14px 14px 18px; font-size: 16px; user-select: none;
+        }
+        .input-wrapper input {
+          flex: 1; background: transparent; border: none; outline: none;
+          color: #e2e8f0; font-size: 15px; padding: 14px 18px 14px 0;
+          font-family: 'Inter', sans-serif;
+        }
+        .input-wrapper input::placeholder { color: #334155; }
+
+        .forgot-row { text-align: right; }
+        .forgot-link {
+          font-size: 13px; color: #7c3aed; text-decoration: none; font-weight: 500;
+          transition: color 0.2s;
+        }
+        .forgot-link:hover { color: #a78bfa; }
+
+        .submit-btn {
+          width: 100%; padding: 16px;
+          background: linear-gradient(135deg, #7c3aed, #6d28d9);
+          border: none; border-radius: 14px; cursor: pointer;
+          color: white; font-size: 15px; font-weight: 700;
+          font-family: 'Inter', sans-serif;
+          letter-spacing: 0.02em;
+          box-shadow: 0 4px 25px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+          transition: transform 0.2s, box-shadow 0.2s;
+          margin-top: 6px;
+        }
+        .submit-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 35px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .submit-btn:active:not(:disabled) { transform: translateY(0px); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .loading-spinner { display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .switch-auth {
+          text-align: center; margin-top: 28px;
+          font-size: 13px; color: #475569;
+        }
+        .switch-link {
+          color: #a78bfa; font-weight: 600; text-decoration: none;
+          transition: color 0.2s;
+        }
+        .switch-link:hover { color: #c4b5fd; }
+      `}</style>
     </div>
   );
 }
