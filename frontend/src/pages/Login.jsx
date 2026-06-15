@@ -174,7 +174,7 @@ export default function Login() {
           </div>
 
           <div ref={addToFields} className="forgot-row">
-            <a href="#" className="forgot-link">Mot de passe oublié ?</a>
+            <Link to="/forgot-password" className="forgot-link">Mot de passe oublié ?</Link>
           </div>
 
           <button ref={btnRef} type="submit" disabled={isLoading} className="submit-btn">
