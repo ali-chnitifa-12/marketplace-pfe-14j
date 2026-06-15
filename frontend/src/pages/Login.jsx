@@ -125,7 +125,7 @@ export default function Login() {
       <div ref={cardRef} className="glass-card">
         {/* Logo */}
         <div ref={addToFields} className="logo-area">
-          <div className="logo-icon">🛒</div>
+          <div className="logo-icon">📍</div>
           <span className="logo-text">Marketplace PFE</span>
         </div>
 
@@ -210,10 +210,8 @@ export default function Login() {
 
         .grid-bg {
           position: fixed; inset: 0;
-          background-image:
-            linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
-          background-size: 50px 50px;
+          background-image: radial-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+          background-size: 30px 30px;
           pointer-events: none;
         }
 
@@ -223,17 +221,17 @@ export default function Login() {
         }
         .orb-1 {
           width: 500px; height: 500px;
-          background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%); /* Orange */
           top: -100px; left: -100px;
         }
         .orb-2 {
           width: 400px; height: 400px;
-          background: radial-gradient(circle, rgba(6,182,212,0.25) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(20,184,166,0.25) 0%, transparent 70%); /* Teal */
           bottom: -80px; right: -60px;
         }
         .orb-3 {
           width: 300px; height: 300px;
-          background: radial-gradient(circle, rgba(251,113,133,0.2) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(234,179,8,0.2) 0%, transparent 70%); /* Yellow */
           top: 50%; left: 60%;
         }
 
@@ -246,7 +244,7 @@ export default function Login() {
           padding: 48px;
           width: 100%; max-width: 460px;
           box-shadow:
-            0 0 0 1px rgba(124,58,237,0.15),
+            0 0 0 1px rgba(249,115,22,0.15),
             0 25px 80px rgba(0,0,0,0.5),
             inset 0 1px 0 rgba(255,255,255,0.07);
           transform-style: preserve-3d;
@@ -258,7 +256,7 @@ export default function Login() {
         .logo-icon { font-size: 28px; }
         .logo-text {
           font-size: 17px; font-weight: 700;
-          background: linear-gradient(135deg, #a78bfa, #38bdf8);
+          background: linear-gradient(135deg, #f97316, #14b8a6);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
@@ -289,8 +287,8 @@ export default function Login() {
           transition: border-color 0.3s, box-shadow 0.3s;
         }
         .input-group.focused .input-wrapper {
-          border-color: rgba(124,58,237,0.6);
-          box-shadow: 0 0 0 3px rgba(124,58,237,0.12), 0 0 20px rgba(124,58,237,0.1);
+          border-color: rgba(249,115,22,0.6);
+          box-shadow: 0 0 0 3px rgba(249,115,22,0.12), 0 0 20px rgba(249,115,22,0.1);
         }
         .input-icon {
           padding: 14px 14px 14px 18px; font-size: 16px; user-select: none;
@@ -304,25 +302,25 @@ export default function Login() {
 
         .forgot-row { text-align: right; }
         .forgot-link {
-          font-size: 13px; color: #7c3aed; text-decoration: none; font-weight: 500;
+          font-size: 13px; color: #f97316; text-decoration: none; font-weight: 500;
           transition: color 0.2s;
         }
-        .forgot-link:hover { color: #a78bfa; }
+        .forgot-link:hover { color: #fdba74; }
 
         .submit-btn {
           width: 100%; padding: 16px;
-          background: linear-gradient(135deg, #7c3aed, #6d28d9);
+          background: linear-gradient(135deg, #f97316, #ea580c);
           border: none; border-radius: 14px; cursor: pointer;
           color: white; font-size: 15px; font-weight: 700;
           font-family: 'Inter', sans-serif;
           letter-spacing: 0.02em;
-          box-shadow: 0 4px 25px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+          box-shadow: 0 4px 25px rgba(249,115,22,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
           transition: transform 0.2s, box-shadow 0.2s;
           margin-top: 6px;
         }
         .submit-btn:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 35px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
+          box-shadow: 0 8px 35px rgba(249,115,22,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
         }
         .submit-btn:active:not(:disabled) { transform: translateY(0px); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -335,10 +333,10 @@ export default function Login() {
           font-size: 13px; color: #475569;
         }
         .switch-link {
-          color: #a78bfa; font-weight: 600; text-decoration: none;
+          color: #14b8a6; font-weight: 600; text-decoration: none;
           transition: color 0.2s;
         }
-        .switch-link:hover { color: #c4b5fd; }
+        .switch-link:hover { color: #5eead4; }
       `}</style>
     </div>
   );
