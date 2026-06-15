@@ -3,10 +3,27 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthContext, AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Home from './pages/Home';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
-  if (loading) return <div>Chargement...</div>;
+  
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: '#050816',
+        display: 'flex',
+        alignItems: 'center',
+        justify-content: 'center',
+        color: '#64748b',
+        fontFamily: 'sans-serif'
+      }}>
+        <div style={{ fontSize: '18px', fontWeight: '500' }}>Chargement...</div>
+      </div>
+    );
+  }
+  
   return user ? children : <Navigate to="/login" />;
 };
 
@@ -17,13 +34,9 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
           <Route path="/" element={
             <PrivateRoute>
-              <div className="p-8">
-                <h1 className="text-3xl font-bold">Bienvenue sur la Marketplace PFE</h1>
-                <p className="mt-4">Vous êtes connecté avec succès ! L'Étudiant 1 prendra le relais pour afficher les annonces ici.</p>
-              </div>
+              <Home />
             </PrivateRoute>
           } />
         </Routes>
