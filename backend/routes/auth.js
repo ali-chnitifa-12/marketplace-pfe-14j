@@ -125,10 +125,27 @@ router.post('/forgot-password', async (req, res) => {
 
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
+    let mailTransporter = transporter;
+    
+    // Auto-generate test account if using dummy credentials
+    if (process.env.MAIL_USER === 'ton.email@gmail.com' || !process.env.MAIL_USER) {
+      console.log('⚠️ Using dummy email credentials. Generating Ethereal test account...');
+      const testAccount = await nodemailer.createTestAccount();
+      mailTransporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+    }
+
     // Try to send email, fallback to console in dev
     try {
-      await transporter.sendMail({
-        from: `"Marketplace PFE" <${process.env.MAIL_USER}>`,
+      const info = await mailTransporter.sendMail({
+        from: `"Marketplace PFE" <${mailTransporter?.options?.auth?.user || process.env.MAIL_USER}>`,
         to: email,
         subject: '🔐 Réinitialisation de votre mot de passe',
         html: `
@@ -146,6 +163,11 @@ router.post('/forgot-password', async (req, res) => {
         `,
       });
       console.log(`✅ Reset email sent to: ${email}`);
+      
+      // If we used a test account, log the URL to preview the email
+      if (nodemailer.getTestMessageUrl(info)) {
+        console.log('📩 Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      }
     } catch (mailErr) {
       // Dev fallback: log the link to console
       console.warn('⚠️  Email not sent (check MAIL_USER/MAIL_PASS in .env). Reset link:');
