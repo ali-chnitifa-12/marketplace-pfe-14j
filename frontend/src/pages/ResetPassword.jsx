@@ -130,7 +130,7 @@ export default function ResetPassword() {
       <div ref={cardRef} className="glass-card">
         {/* Logo */}
         <div ref={addToFields} className="logo-area">
-          <div className="logo-icon">🛒</div>
+          <div className="logo-icon">📍</div>
           <span className="logo-text">Marketplace PFE</span>
         </div>
 
@@ -220,29 +220,27 @@ export default function ResetPassword() {
 
         .grid-bg {
           position: fixed; inset: 0;
-          background-image:
-            linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
-          background-size: 50px 50px; pointer-events: none;
+          background-image: radial-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+          background-size: 30px 30px; pointer-events: none;
         }
 
         .orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
-        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%); top: -100px; left: -100px; }
-        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%); bottom: -80px; right: -60px; }
-        .orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(251,113,133,0.15) 0%, transparent 70%); top: 45%; left: 55%; }
+        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(20,184,166,0.3) 0%, transparent 70%); top: -100px; left: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(249,115,22,0.25) 0%, transparent 70%); bottom: -80px; right: -60px; }
+        .orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(234,179,8,0.2) 0%, transparent 70%); top: 45%; left: 55%; }
 
         .glass-card {
           position: relative; z-index: 10;
           background: rgba(255,255,255,0.03); backdrop-filter: blur(20px);
           border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 48px;
           width: 100%; max-width: 460px;
-          box-shadow: 0 0 0 1px rgba(124,58,237,0.15), 0 25px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+          box-shadow: 0 0 0 1px rgba(20,184,166,0.15), 0 25px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
           transform-style: preserve-3d;
         }
 
         .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
         .logo-icon { font-size: 26px; }
-        .logo-text { font-size: 16px; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-text { font-size: 16px; font-weight: 700; background: linear-gradient(135deg, #14b8a6, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .header-area { text-align: center; margin-bottom: 28px; }
         .shield-icon { font-size: 44px; margin-bottom: 14px; }
@@ -257,7 +255,7 @@ export default function ResetPassword() {
 
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
         .input-wrapper { display: flex; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
-        .input-group.focused .input-wrapper { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 0 3px rgba(124,58,237,0.12), 0 0 20px rgba(124,58,237,0.1); }
+        .input-group.focused .input-wrapper { border-color: rgba(20,184,166,0.6); box-shadow: 0 0 0 3px rgba(20,184,166,0.12), 0 0 20px rgba(20,184,166,0.1); }
         .input-icon { padding: 14px 14px 14px 18px; font-size: 16px; }
         .input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: #e2e8f0; font-size: 15px; padding: 14px 0; font-family: 'Inter', sans-serif; }
         .input-wrapper input::placeholder { color: #334155; }
@@ -271,13 +269,13 @@ export default function ResetPassword() {
         .strength-bar.strong { flex: 1; background: #34d399; }
         .strength-text { font-size: 11px; color: #64748b; white-space: nowrap; }
 
-        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #7c3aed, #6d28d9); border: none; border-radius: 14px; cursor: pointer; color: white; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; box-shadow: 0 4px 25px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.15); transition: transform 0.2s, box-shadow 0.2s; }
-        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 35px rgba(124,58,237,0.55); }
+        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #14b8a6, #0d9488); border: none; border-radius: 14px; cursor: pointer; color: white; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; box-shadow: 0 4px 25px rgba(20,184,166,0.4), inset 0 1px 0 rgba(255,255,255,0.15); transition: transform 0.2s, box-shadow 0.2s; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 35px rgba(20,184,166,0.55); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .switch-auth { text-align: center; margin-top: 24px; font-size: 13px; }
-        .switch-link { color: #a78bfa; font-weight: 600; text-decoration: none; transition: color 0.2s; }
-        .switch-link:hover { color: #c4b5fd; }
+        .switch-link { color: #14b8a6; font-weight: 600; text-decoration: none; transition: color 0.2s; }
+        .switch-link:hover { color: #5eead4; }
       `}</style>
     </div>
   );

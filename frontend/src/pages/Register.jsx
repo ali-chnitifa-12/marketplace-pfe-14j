@@ -114,7 +114,7 @@ export default function Register() {
       <div ref={cardRef} className="glass-card">
         {/* Logo */}
         <div ref={addToFields} className="logo-area">
-          <div className="logo-icon">🛒</div>
+          <div className="logo-icon">📍</div>
           <span className="logo-text">Marketplace PFE</span>
         </div>
 
@@ -226,16 +226,14 @@ export default function Register() {
 
         .grid-bg {
           position: fixed; inset: 0;
-          background-image:
-            linear-gradient(rgba(6,182,212,0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(6,182,212,0.05) 1px, transparent 1px);
-          background-size: 50px 50px; pointer-events: none;
+          background-image: radial-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+          background-size: 30px 30px; pointer-events: none;
         }
 
         .orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
-        .orb-1 { width: 550px; height: 550px; background: radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 70%); top: -120px; right: -100px; }
-        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%); bottom: -100px; left: -80px; }
-        .orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%); top: 40%; left: 20%; }
+        .orb-1 { width: 550px; height: 550px; background: radial-gradient(circle, rgba(20,184,166,0.3) 0%, transparent 70%); top: -120px; right: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%); bottom: -100px; left: -80px; }
+        .orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(234,179,8,0.15) 0%, transparent 70%); top: 40%; left: 20%; }
 
         .glass-card {
           position: relative; z-index: 10;
@@ -244,13 +242,13 @@ export default function Register() {
           border: 1px solid rgba(255,255,255,0.07);
           border-radius: 28px; padding: 44px;
           width: 100%; max-width: 470px;
-          box-shadow: 0 0 0 1px rgba(6,182,212,0.12), 0 30px 90px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+          box-shadow: 0 0 0 1px rgba(20,184,166,0.12), 0 30px 90px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
           transform-style: preserve-3d;
         }
 
         .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
         .logo-icon { font-size: 28px; }
-        .logo-text { font-size: 17px; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-text { font-size: 17px; font-weight: 700; background: linear-gradient(135deg, #14b8a6, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .card-title-area { margin-bottom: 24px; }
         .card-title { font-size: 28px; font-weight: 800; color: #f1f5f9; }
@@ -258,7 +256,7 @@ export default function Register() {
 
         .progress-area { margin-bottom: 24px; }
         .progress-track { height: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #06b6d4, #7c3aed); border-radius: 10px; transition: width 0.5s ease; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #14b8a6, #f97316); border-radius: 10px; transition: width 0.5s ease; }
         .progress-label { font-size: 11px; color: #475569; margin-top: 6px; display: block; text-align: right; }
 
         .error-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 12px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; }
@@ -267,7 +265,7 @@ export default function Register() {
 
         .input-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
         .input-wrapper { display: flex; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; transition: all 0.3s; }
-        .input-group.focused .input-wrapper { border-color: rgba(6,182,212,0.6); box-shadow: 0 0 0 3px rgba(6,182,212,0.12), 0 0 20px rgba(6,182,212,0.08); }
+        .input-group.focused .input-wrapper { border-color: rgba(20,184,166,0.6); box-shadow: 0 0 0 3px rgba(20,184,166,0.12), 0 0 20px rgba(20,184,166,0.08); }
         .input-icon { padding: 14px 12px 14px 16px; font-size: 16px; user-select: none; }
         .input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: #e2e8f0; font-size: 15px; padding: 14px 8px; font-family: 'Inter', sans-serif; }
         .input-wrapper input::placeholder { color: #1e293b; }
@@ -280,16 +278,16 @@ export default function Register() {
         .strength-bar.strong { background: #34d399; width: 100%; }
         .strength-text { font-size: 11px; color: #64748b; white-space: nowrap; }
 
-        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #0891b2, #06b6d4); border: none; border-radius: 14px; cursor: pointer; color: white; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; box-shadow: 0 4px 30px rgba(6,182,212,0.4), inset 0 1px 0 rgba(255,255,255,0.15); transition: transform 0.2s, box-shadow 0.2s; margin-top: 6px; }
-        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(6,182,212,0.55); }
+        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #14b8a6, #0d9488); border: none; border-radius: 14px; cursor: pointer; color: white; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; box-shadow: 0 4px 30px rgba(20,184,166,0.4), inset 0 1px 0 rgba(255,255,255,0.15); transition: transform 0.2s, box-shadow 0.2s; margin-top: 6px; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(20,184,166,0.55); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .features-row { display: flex; gap: 10px; margin-top: 24px; justify-content: center; flex-wrap: wrap; }
-        .feature-badge { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #64748b; font-size: 12px; padding: 5px 12px; border-radius: 100px; }
+        .feature-badge { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; font-size: 12px; padding: 5px 12px; border-radius: 100px; }
 
         .switch-auth { text-align: center; margin-top: 20px; font-size: 13px; color: #475569; }
-        .switch-link { color: #38bdf8; font-weight: 600; text-decoration: none; transition: color 0.2s; }
-        .switch-link:hover { color: #7dd3fc; }
+        .switch-link { color: #f97316; font-weight: 600; text-decoration: none; transition: color 0.2s; }
+        .switch-link:hover { color: #fdba74; }
       `}</style>
     </div>
   );

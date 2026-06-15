@@ -104,7 +104,7 @@ export default function Home() {
       <div ref={cardRef} className="glass-card">
         {/* Logo */}
         <div className="logo-area">
-          <div className="logo-icon">🛒</div>
+          <div className="logo-icon">📍</div>
           <span className="logo-text">Marketplace PFE</span>
         </div>
 
@@ -154,10 +154,8 @@ export default function Home() {
 
         .grid-bg {
           position: fixed; inset: 0;
-          background-image:
-            linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
-          background-size: 50px 50px;
+          background-image: radial-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+          background-size: 30px 30px;
           pointer-events: none;
         }
 
@@ -167,17 +165,17 @@ export default function Home() {
         }
         .orb-1 {
           width: 500px; height: 500px;
-          background: radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%);
           top: -100px; left: -100px;
         }
         .orb-2 {
           width: 400px; height: 400px;
-          background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(20,184,166,0.2) 0%, transparent 70%);
           bottom: -80px; right: -60px;
         }
         .orb-3 {
           width: 300px; height: 300px;
-          background: radial-gradient(circle, rgba(244,63,94,0.15) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(234,179,8,0.15) 0%, transparent 70%);
           top: 50%; left: 60%;
         }
 
@@ -190,7 +188,7 @@ export default function Home() {
           padding: 48px;
           width: 100%; max-width: 480px;
           box-shadow:
-            0 0 0 1px rgba(124,58,237,0.15),
+            0 0 0 1px rgba(20,184,166,0.15),
             0 25px 80px rgba(0,0,0,0.5),
             inset 0 1px 0 rgba(255,255,255,0.07);
           transform-style: preserve-3d;
@@ -203,7 +201,7 @@ export default function Home() {
         .logo-icon { font-size: 28px; }
         .logo-text {
           font-size: 17px; font-weight: 700;
-          background: linear-gradient(135deg, #a78bfa, #38bdf8);
+          background: linear-gradient(135deg, #14b8a6, #f97316);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
@@ -228,14 +226,14 @@ export default function Home() {
         .profile-avatar {
           width: 70px; height: 70px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #7c3aed, #06b6d4);
+          background: linear-gradient(135deg, #f97316, #14b8a6);
           color: white;
           font-size: 28px;
           font-weight: 800;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 0 20px rgba(124,58,237,0.3);
+          box-shadow: 0 0 20px rgba(249,115,22,0.3);
         }
 
         .user-details { text-align: center; }
