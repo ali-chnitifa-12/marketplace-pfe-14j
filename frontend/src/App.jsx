@@ -69,6 +69,16 @@ function App() {
               <AdminDashboard />
             </AdminRoute>
           } />
+          <Route path="/create-annonce" element={
+            <PrivateRoute>
+              <CreateAnnonce />
+            </PrivateRoute>
+          } />
+          <Route path="/annonce/:id" element={
+            <PrivateRoute>
+              <AnnonceDetails />
+            </PrivateRoute>
+          } />
           <Route path="/" element={
             <PrivateRoute>
               <Home />
