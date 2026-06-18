@@ -7,6 +7,9 @@ import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import CreateAnnonce from './pages/CreateAnnonce';
+import AnnonceDetails from './pages/AnnonceDetails';
+
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
