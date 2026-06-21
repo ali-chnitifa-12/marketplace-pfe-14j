@@ -37,7 +37,25 @@ const Annonce = sequelize.define('Annonce', {
     // Storing image URLs or paths as a JSON string
     type: DataTypes.JSON, 
     allowNull: true,
-    defaultValue: []
+    defaultValue: [],
+    get() {
+      const rawValue = this.getDataValue('images');
+      if (typeof rawValue === 'string') {
+        try {
+          return JSON.parse(rawValue);
+        } catch(e) {
+          return [];
+        }
+      }
+      return rawValue || [];
+    },
+    set(val) {
+      if (typeof val === 'string') {
+        this.setDataValue('images', val);
+      } else {
+        this.setDataValue('images', JSON.stringify(val));
+      }
+    }
   },
   latitude: {
     type: DataTypes.FLOAT,
