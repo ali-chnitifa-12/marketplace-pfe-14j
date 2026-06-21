@@ -28,6 +28,11 @@ const Annonce = sequelize.define('Annonce', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  statut: {
+    type: DataTypes.ENUM('Disponible', 'Vendu', 'Annulé'),
+    defaultValue: 'Disponible',
+    allowNull: false,
+  },
   images: {
     // Storing image URLs or paths as a JSON string
     type: DataTypes.JSON, 

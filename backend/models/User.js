@@ -42,6 +42,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  telephone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   localisation: {
     type: DataTypes.GEOMETRY('POINT'),
     allowNull: true,
