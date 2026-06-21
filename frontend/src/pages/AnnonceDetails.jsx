@@ -149,7 +149,7 @@ export default function AnnonceDetails() {
   }
 
   const waLink = annonce.User?.telephone 
-    ? `https://wa.me/${annonce.User.telephone.replace(/[^0-9]/g, '')}?text=Bonjour, je suis intéressé par votre annonce "${annonce.titre}" sur Marketplace PFE.` 
+    ? `https://wa.me/${annonce.User.telephone.replace(/[^0-9]/g, '')}?text=Bonjour, je suis intéressé par votre annonce "${annonce.titre}" sur Products Marketplace.` 
     : '#';
 
   return (

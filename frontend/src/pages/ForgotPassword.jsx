@@ -99,7 +99,7 @@ export default function ForgotPassword() {
         {/* Logo */}
         <div ref={addToFields} className="logo-area">
           <div className="logo-icon">📍</div>
-          <span className="logo-text">Marketplace PFE</span>
+          <span className="logo-text">Products Marketplace</span>
         </div>
 
         {/* Icon */}

@@ -145,20 +145,20 @@ router.post('/forgot-password', async (req, res) => {
     // Try to send email, fallback to console in dev
     try {
       const info = await mailTransporter.sendMail({
-        from: `"Marketplace PFE" <${mailTransporter?.options?.auth?.user || process.env.MAIL_USER}>`,
+        from: `"Products Marketplace" <${mailTransporter?.options?.auth?.user || process.env.MAIL_USER}>`,
         to: email,
-        subject: '🔐 Réinitialisation de votre mot de passe',
+        subject: 'Réinitialisation de votre mot de passe',
         html: `
-          <div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto; background: #050816; color: #e2e8f0; padding: 40px; border-radius: 20px;">
-            <h2 style="color: #a78bfa;">Réinitialisation du mot de passe</h2>
-            <p>Bonjour <strong>${user.nom}</strong>,</p>
-            <p>Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous :</p>
-            <a href="${resetUrl}" style="display:inline-block; margin: 24px 0; padding: 14px 28px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; text-decoration: none; border-radius: 12px; font-weight: 700;">
-              Réinitialiser mon mot de passe
-            </a>
-            <p style="color: #64748b; font-size: 13px;">Ce lien expire dans <strong>1 heure</strong>. Si vous n'avez pas fait cette demande, ignorez cet email.</p>
-            <hr style="border-color: rgba(255,255,255,0.08); margin: 20px 0;">
-            <p style="color: #475569; font-size: 12px;">Marketplace PFE — Projet de Fin d'Études</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #f97316;">Réinitialisation de mot de passe</h2>
+            <p>Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" style="background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Réinitialiser mon mot de passe</a>
+            </div>
+            <p>Ce lien est valide pendant 1 heure.</p>
+            <p>Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="color: #475569; font-size: 12px;">Products Marketplace — Projet de Fin d'Études</p>
           </div>
         `,
       });

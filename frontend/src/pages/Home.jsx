@@ -106,7 +106,7 @@ export default function Home() {
       <nav ref={navRef} className="top-nav">
         <div className="nav-left">
           <span className="nav-logo-icon">📍</span>
-          <span className="nav-logo-text">Marketplace PFE</span>
+          <span className="nav-logo-text">Products Marketplace</span>
         </div>
         
         <div className="nav-center">

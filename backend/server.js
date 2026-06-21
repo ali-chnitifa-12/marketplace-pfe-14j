@@ -22,7 +22,7 @@ app.use('/api/offres', require('./routes/offres'));
 
 // Test route
 app.get('/', (req, res) => {
-  res.send('Marketplace PFE API is running...');
+  res.send('Products Marketplace API is running...');
 });
 
 const PORT = process.env.PORT || 5000;
