@@ -3,6 +3,17 @@ import { useParams, Link } from 'react-router-dom';
 import gsap from 'gsap';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for leaflet markers
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 export default function AnnonceDetails() {
   const { id } = useParams();
@@ -171,6 +182,25 @@ export default function AnnonceDetails() {
             <p>{annonce.description}</p>
           </div>
           
+          {annonce.latitude && annonce.longitude && (
+            <div className="details-map-section">
+              <h3>Localisation du produit</h3>
+              <div className="map-container">
+                <MapContainer center={[annonce.latitude, annonce.longitude]} zoom={13} style={{ height: '300px', width: '100%', borderRadius: '16px' }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <Marker position={[annonce.latitude, annonce.longitude]}>
+                    <Popup>
+                      Lieu approximatif du produit.
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+            </div>
+          )}
+
           <div className="details-meta">
             <p>Publié le : {new Date(annonce.createdAt).toLocaleDateString('fr-FR')}</p>
             <p>Référence : #{annonce.id}</p>
@@ -314,6 +344,11 @@ export default function AnnonceDetails() {
 
         .details-description h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
         .details-description p { font-size: 16px; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; margin-bottom: 32px; }
+        
+        .details-map-section { margin-bottom: 32px; }
+        .details-map-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
+        .map-container { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+
         .details-meta { font-size: 13px; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }

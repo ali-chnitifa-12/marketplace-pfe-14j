@@ -39,6 +39,14 @@ const Annonce = sequelize.define('Annonce', {
     allowNull: true,
     defaultValue: []
   },
+  latitude: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
+  longitude: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

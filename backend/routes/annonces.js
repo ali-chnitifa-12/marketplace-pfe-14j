@@ -81,7 +81,7 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     }
 
-    const { titre, description, prix, etat, categorie, images } = req.body;
+    const { titre, description, prix, etat, categorie, images, latitude, longitude } = req.body;
 
     const nouvelleAnnonce = await Annonce.create({
       titre,
@@ -90,6 +90,8 @@ router.post('/', authMiddleware, async (req, res) => {
       etat,
       categorie,
       images: images || [],
+      latitude,
+      longitude,
       userId: req.user.id
     });
 

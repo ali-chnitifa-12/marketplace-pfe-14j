@@ -14,6 +14,8 @@ export default function CreateAnnonce() {
   const [etat, setEtat] = useState('Bon état');
   const [categorie, setCategorie] = useState('Électronique');
   const [imageUrl, setImageUrl] = useState('');
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -48,7 +50,9 @@ export default function CreateAnnonce() {
         prix: parseFloat(prix),
         etat,
         categorie,
-        images: imageUrl ? [imageUrl] : []
+        images: imageUrl ? [imageUrl] : [],
+        latitude,
+        longitude
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -156,6 +160,30 @@ export default function CreateAnnonce() {
             <small className="help-text">Pour le moment, collez une URL d'image publique.</small>
           </div>
 
+          <div className="form-group">
+            <label>Localisation (Optionnel)</label>
+            <button 
+              type="button" 
+              className={`geo-btn ${latitude ? 'success' : ''}`}
+              onClick={() => {
+                if(navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                      setLatitude(pos.coords.latitude);
+                      setLongitude(pos.coords.longitude);
+                    },
+                    (err) => alert('Erreur de localisation : ' + err.message)
+                  );
+                } else {
+                  alert('La géolocalisation n\'est pas supportée par votre navigateur.');
+                }
+              }}
+            >
+              {latitude ? `✅ Localisation capturée (${latitude.toFixed(2)}, ${longitude.toFixed(2)})` : '📍 Ajouter ma localisation exacte'}
+            </button>
+            <small className="help-text">Permet aux acheteurs de voir où se trouve le produit sur une carte.</small>
+          </div>
+
           <button type="submit" disabled={isLoading} className="submit-btn">
             {isLoading ? 'Publication...' : 'Publier mon annonce →'}
           </button>
@@ -182,6 +210,10 @@ export default function CreateAnnonce() {
           padding: 40px; position: relative; z-index: 10;
           box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
         }
+
+        .geo-btn { width: 100%; padding: 14px; background: rgba(20,184,166,0.1); border: 1px dashed rgba(20,184,166,0.4); color: #5eead4; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .geo-btn:hover { background: rgba(20,184,166,0.2); }
+        .geo-btn.success { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.4); color: #4ade80; border-style: solid; }
 
         .back-link { color: #94a3b8; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-block; margin-bottom: 24px; transition: color 0.2s; }
         .back-link:hover { color: #f1f5f9; }
