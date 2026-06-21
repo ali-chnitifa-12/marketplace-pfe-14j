@@ -1,14 +1,28 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import { Bar, Pie } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 export default function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [stats, setStats] = useState({ totalUsers: 0, totalAdmins: 0, totalBanned: 0, totalActive: 0 });
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalAdmins: 0,
+    totalBanned: 0,
+    totalActive: 0,
+    totalAnnonces: 0,
+    totalFlaggedAnnonces: 0,
+    totalCommandes: 0,
+    annoncesParCategorie: []
+  });
   const [users, setUsers] = useState([]);
+  const [flaggedAnnonces, setFlaggedAnnonces] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAdminData = async () => {
@@ -16,13 +30,15 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [statsRes, usersRes] = await Promise.all([
+      const [statsRes, usersRes, flaggedRes] = await Promise.all([
         axios.get('http://localhost:5000/api/admin/stats', { headers }),
-        axios.get('http://localhost:5000/api/admin/users', { headers })
+        axios.get('http://localhost:5000/api/admin/users', { headers }),
+        axios.get('http://localhost:5000/api/admin/annonces/flagged', { headers })
       ]);
 
       setStats(statsRes.data);
       setUsers(usersRes.data);
+      setFlaggedAnnonces(flaggedRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -72,7 +88,84 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleApproveAnnonce = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/admin/annonces/${id}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchAdminData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
+  const handleDeleteAnnonce = async (id) => {
+    if (!window.confirm("Supprimer cette annonce définitivement ?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/admin/annonces/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchAdminData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
   if (loading) return <div className="admin-page"><div className="grid-bg"/><h2>Chargement du Dashboard...</h2></div>;
+
+  // Chart configs
+  const categoryLabels = stats.annoncesParCategorie?.map(item => item.categorie) || [];
+  const categoryCounts = stats.annoncesParCategorie?.map(item => item.count) || [];
+
+  const barChartData = {
+    labels: categoryLabels.length > 0 ? categoryLabels : ['Aucune annonce'],
+    datasets: [
+      {
+        label: 'Annonces par Catégorie',
+        data: categoryCounts.length > 0 ? categoryCounts : [0],
+        backgroundColor: 'rgba(249, 115, 22, 0.6)',
+        borderColor: '#ea580c',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const pieChartData = {
+    labels: ['Comptes Actifs', 'Comptes Bannis'],
+    datasets: [
+      {
+        data: [stats.totalActive || 0, stats.totalBanned || 0],
+        backgroundColor: ['rgba(16, 185, 129, 0.6)', 'rgba(239, 68, 68, 0.6)'],
+        borderColor: ['#10b981', '#ef4444'],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#e2e8f0', // text primary in dark mode style
+          font: { family: 'Inter', size: 12 }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: '#94a3b8' }
+      },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: '#94a3b8' }
+      }
+    }
+  };
 
   return (
     <div className="admin-page">
@@ -89,12 +182,8 @@ export default function AdminDashboard() {
 
         <div className="stats-grid">
           <div className="stat-card">
-            <h3>Total Utilisateurs</h3>
+            <h3>Utilisateurs</h3>
             <p className="stat-value">{stats.totalUsers}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Admins Actifs</h3>
-            <p className="stat-value text-purple">{stats.totalAdmins}</p>
           </div>
           <div className="stat-card">
             <h3>Comptes Actifs</h3>
@@ -104,6 +193,89 @@ export default function AdminDashboard() {
             <h3>Comptes Bannis</h3>
             <p className="stat-value text-red">{stats.totalBanned}</p>
           </div>
+          <div className="stat-card">
+            <h3>Annonces</h3>
+            <p className="stat-value text-orange">{stats.totalAnnonces || 0}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Commandes</h3>
+            <p className="stat-value text-teal">{stats.totalCommandes || 0}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Annonces Signalées</h3>
+            <p className="stat-value text-pink">{stats.totalFlaggedAnnonces || 0}</p>
+          </div>
+        </div>
+
+        <div className="charts-container">
+          <div className="chart-card">
+            <h3>Distribution des Annonces par Catégorie</h3>
+            <div className="chart-wrapper">
+              <Bar data={barChartData} options={chartOptions} />
+            </div>
+          </div>
+          <div className="chart-card">
+            <h3>Répartition des Utilisateurs</h3>
+            <div className="chart-wrapper">
+              <Pie data={pieChartData} options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    labels: {
+                      color: '#e2e8f0',
+                      font: { family: 'Inter', size: 12 }
+                    }
+                  }
+                }
+              }} />
+            </div>
+          </div>
+        </div>
+
+        <div className="users-section glass-card" style={{ marginBottom: '40px' }}>
+          <h2>Modération (Annonces Signalées par l'anti-spam IA)</h2>
+          {flaggedAnnonces.length === 0 ? (
+            <p style={{ color: 'var(--text-secondary)' }}>Aucune annonce signalée pour le moment.</p>
+          ) : (
+            <div className="table-responsive">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Titre</th>
+                    <th>Vendeur</th>
+                    <th>Prix</th>
+                    <th>Catégorie</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {flaggedAnnonces.map(a => (
+                    <tr key={a.id}>
+                      <td>
+                        <Link to={`/annonce/${a.id}`} style={{ color: '#ea580c', fontWeight: 600, textDecoration: 'none' }}>
+                          {a.titre}
+                        </Link>
+                      </td>
+                      <td>{a.User?.nom || 'Inconnu'}</td>
+                      <td>{a.prix} DH</td>
+                      <td>{a.categorie}</td>
+                      <td>
+                        <div className="action-buttons">
+                          <button onClick={() => handleApproveAnnonce(a.id)} className="btn-approve">
+                            Approuver
+                          </button>
+                          <button onClick={() => handleDeleteAnnonce(a.id)} className="btn-delete">
+                            Supprimer
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         <div className="users-section glass-card">
@@ -167,13 +339,21 @@ export default function AdminDashboard() {
         .btn-logout { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.2); padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-logout:hover { background: rgba(239,68,68,0.2); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 24px; border-radius: 20px; text-align: center; }
-        .stat-card h3 { font-size: 14px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
-        .stat-value { font-size: 48px; font-weight: 900; margin: 0; }
+        .stat-card h3 { font-size: 13px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-value { font-size: 36px; font-weight: 900; margin: 0; }
         .text-purple { color: #8b5cf6; }
         .text-green { color: #10b981; }
         .text-red { color: #ef4444; }
+        .text-orange { color: #f97316; }
+        .text-teal { color: #14b8a6; }
+        .text-pink { color: #ec4899; }
+
+        .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; }
+        .chart-card h3 { font-size: 16px; margin-bottom: 20px; color: var(--text-primary); text-align: center; }
+        .chart-wrapper { width: 100%; height: 260px; position: relative; display: flex; align-items: center; justify-content: center; }
 
         .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; padding: 30px; }
         .users-section h2 { margin-bottom: 20px; font-size: 20px; color: var(--text-primary); }
@@ -195,6 +375,7 @@ export default function AdminDashboard() {
         .btn-role { background: rgba(139,92,246,0.1); color: #8b5cf6; }
         .btn-ban { background: rgba(245,158,11,0.1); color: #d97706; }
         .btn-ban.unban { background: rgba(16,185,129,0.1); color: #10b981; }
+        .btn-approve { background: rgba(16, 185, 129, 0.1); color: #10b981; }
         .btn-delete { background: rgba(239,68,68,0.1); color: #ef4444; }
         .action-buttons button:hover { filter: brightness(0.9); }
       `}</style>

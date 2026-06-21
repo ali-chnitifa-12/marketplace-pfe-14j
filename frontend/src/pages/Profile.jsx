@@ -32,7 +32,7 @@ export default function Profile() {
       const resFav = await axios.get('http://localhost:5000/api/favoris', { headers });
       setFavoris(resFav.data);
 
-      const resCmd = await axios.get('http://localhost:5000/api/commandes/mes-commandes', { headers });
+      const resCmd = await axios.get('http://localhost:5000/api/commandes/mes-achats', { headers });
       setMesCommandes(resCmd.data);
       
       if (user?.typeCompte === 'vendeur') {
@@ -43,7 +43,7 @@ export default function Profile() {
         const resOffres = await axios.get('http://localhost:5000/api/offres/recues', { headers });
         setOffresRecues(resOffres.data);
 
-        const resCmdRecues = await axios.get('http://localhost:5000/api/commandes/vendeur', { headers });
+        const resCmdRecues = await axios.get('http://localhost:5000/api/commandes/mes-ventes', { headers });
         setCommandesRecues(resCmdRecues.data);
       }
     } catch (err) {
@@ -83,6 +83,18 @@ export default function Profile() {
     }
   };
 
+  const handleUpdateCommandeStatut = async (id, statut) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/commandes/${id}/statut`, { statut }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchData(); // Refresh
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const getInitials = (name) => {
     if (!name) return 'U';
     const p = name.trim().split(' ');
@@ -112,10 +124,12 @@ export default function Profile() {
         <div className="tabs">
           <button className={activeTab === 'infos' ? 'active' : ''} onClick={() => setActiveTab('infos')}>Mes Infos</button>
           <button className={activeTab === 'favoris' ? 'active' : ''} onClick={() => setActiveTab('favoris')}>Mes Favoris</button>
+          <button className={activeTab === 'achats' ? 'active' : ''} onClick={() => setActiveTab('achats')}>Mes Achats</button>
           {user?.typeCompte === 'vendeur' && (
             <>
               <button className={activeTab === 'annonces' ? 'active' : ''} onClick={() => setActiveTab('annonces')}>Mes Annonces</button>
               <button className={activeTab === 'offres' ? 'active' : ''} onClick={() => setActiveTab('offres')}>Offres Reçues</button>
+              <button className={activeTab === 'ventes' ? 'active' : ''} onClick={() => setActiveTab('ventes')}>Commandes Reçues</button>
             </>
           )}
         </div>
@@ -211,6 +225,72 @@ export default function Profile() {
             </div>
           )}
 
+          {activeTab === 'achats' && (
+            <div className="achats-tab">
+              <h2>Mes Achats (Commandes passées)</h2>
+              {mesCommandes.length === 0 ? <p>Aucun achat pour le moment.</p> : (
+                <div className="commandes-list">
+                  {mesCommandes.map(cmd => (
+                    <div key={cmd.id} className="commande-item">
+                      <div className="commande-details">
+                        <h4>Annonce : <Link to={`/annonce/${cmd.Annonce?.id}`}>{cmd.Annonce?.titre}</Link></h4>
+                        <p className="price">Prix : <strong>{cmd.prixTotal} DH</strong></p>
+                        <p>Vendeur : {cmd.Annonce?.User?.nom || 'Inconnu'} ({cmd.Annonce?.User?.telephone || 'Pas de tel'})</p>
+                        <p>Adresse de livraison : {cmd.adresseLivraison}</p>
+                        <p>Mode de livraison : {cmd.modeLivraison} {cmd.modeLivraison === 'Point Relais' && `(ID Point: ${cmd.pointRelaisId})`}</p>
+                      </div>
+                      <div className="commande-status-col">
+                        <span className={`badge ${cmd.statut.toLowerCase().replace(' ', '-')}`}>{cmd.statut}</span>
+                        {cmd.Annonce?.User?.telephone && (
+                          <a href={`https://wa.me/${cmd.Annonce.User.telephone.replace('+', '').replace(/\s/g, '')}`} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-small">
+                            Contacter Vendeur
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'ventes' && (
+            <div className="ventes-tab">
+              <h2>Commandes reçues</h2>
+              {commandesRecues.length === 0 ? <p>Aucune commande reçue pour le moment.</p> : (
+                <div className="commandes-list">
+                  {commandesRecues.map(cmd => (
+                    <div key={cmd.id} className="commande-item">
+                      <div className="commande-details">
+                        <h4>Annonce : <Link to={`/annonce/${cmd.Annonce?.id}`}>{cmd.Annonce?.titre}</Link></h4>
+                        <p className="price">Prix : <strong>{cmd.prixTotal} DH</strong></p>
+                        <p>Acheteur : {cmd.acheteur?.nom} ({cmd.telephone || 'Pas de tel'})</p>
+                        <p>Adresse de livraison : {cmd.adresseLivraison}</p>
+                        <p>Mode de livraison : {cmd.modeLivraison} {cmd.modeLivraison === 'Point Relais' && `(ID Point: ${cmd.pointRelaisId})`}</p>
+                      </div>
+                      <div className="commande-actions-col">
+                        <span className={`badge ${cmd.statut.toLowerCase().replace(' ', '-')}`}>{cmd.statut}</span>
+                        <div className="status-update">
+                          <label>Modifier le statut :</label>
+                          <select 
+                            value={cmd.statut} 
+                            onChange={(e) => handleUpdateCommandeStatut(cmd.id, e.target.value)}
+                            className="status-select"
+                          >
+                            <option value="En attente">En attente</option>
+                            <option value="Expédiée">Expédiée</option>
+                            <option value="Livrée">Livrée</option>
+                            <option value="Annulée">Annulée</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -266,6 +346,25 @@ export default function Profile() {
         .btn-reject { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .btn-accept:hover { background: rgba(34,197,94,0.2); }
         .btn-reject:hover { background: rgba(239,68,68,0.2); }
+
+        .commandes-list { display: flex; flex-direction: column; gap: 15px; }
+        .commande-item { background: var(--card-bg-hover); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .commande-details h4 { margin: 0 0 5px; color: #ea580c; }
+        .commande-details h4 a { text-decoration: none; color: inherit; }
+        .commande-details h4 a:hover { text-decoration: underline; }
+        .commande-details p { margin: 0 0 5px; font-size: 14px; color: var(--text-secondary); }
+        .commande-status-col, .commande-actions-col { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        .btn-whatsapp-small { background: #25d366; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .btn-whatsapp-small:hover { background: #128c7e; }
+        .status-update { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .status-update label { font-size: 11px; color: var(--text-secondary); }
+        .status-select { background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 4px 8px; border-radius: 6px; font-size: 13px; outline: none; }
+        .status-select:focus { border-color: #f97316; }
+        
+        .badge.en-attente { background: rgba(249,115,22,0.2); color: #ea580c; }
+        .badge.expédiée { background: rgba(59,130,246,0.2); color: #2563eb; }
+        .badge.livrée { background: rgba(34,197,94,0.2); color: #16a34a; }
+        .badge.annulée { background: rgba(239,68,68,0.2); color: #dc2626; }
       `}</style>
     </div>
   );

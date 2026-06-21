@@ -1,6 +1,9 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const User = require('../models/User');
+const Annonce = require('../models/Annonce');
+const Commande = require('../models/Commande');
+const sequelize = require('../config/database');
 const authMiddleware = require('../middlewares/authMiddleware');
 const adminMiddleware = require('../middlewares/adminMiddleware');
 
@@ -44,7 +47,31 @@ router.get('/stats', async (req, res) => {
     const totalBanned = await User.count({ where: { isBanned: true } });
     const totalActive = await User.count({ where: { isBanned: false } });
 
-    res.json({ totalUsers, totalAdmins, totalBanned, totalActive });
+    const totalAnnonces = await Annonce.count();
+    const totalFlaggedAnnonces = await Annonce.count({ where: { isFlagged: true } });
+    const totalCommandes = await Commande.count();
+
+    // Group ads by category
+    const categories = await Annonce.findAll({
+      attributes: ['categorie', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+      group: ['categorie']
+    });
+
+    const annoncesParCategorie = categories.map(c => ({
+      categorie: c.getDataValue('categorie'),
+      count: parseInt(c.getDataValue('count') || 0, 10)
+    }));
+
+    res.json({
+      totalUsers,
+      totalAdmins,
+      totalBanned,
+      totalActive,
+      totalAnnonces,
+      totalFlaggedAnnonces,
+      totalCommandes,
+      annoncesParCategorie
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erreur lors de la récupération des statistiques.' });
@@ -124,6 +151,51 @@ router.delete('/users/:id', async (req, res) => {
 
     await user.destroy();
     res.json({ message: `Utilisateur "${user.nom}" supprimé avec succès.` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la suppression.' });
+  }
+});
+
+// ─── Get flagged annonces ──────────────────────────────────────────────────
+router.get('/annonces/flagged', async (req, res) => {
+  try {
+    const annonces = await Annonce.findAll({
+      where: { isFlagged: true },
+      include: [{ model: User, attributes: ['nom', 'email'] }],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(annonces);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la récupération des annonces signalées.' });
+  }
+});
+
+// ─── Approve (unflag) annonce ──────────────────────────────────────────────
+router.put('/annonces/:id/approve', async (req, res) => {
+  try {
+    const annonce = await Annonce.findByPk(req.params.id);
+    if (!annonce) {
+      return res.status(404).json({ message: 'Annonce introuvable.' });
+    }
+    await annonce.update({ isFlagged: false });
+    res.json({ message: 'Annonce approuvée avec succès.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de l\'approbation.' });
+  }
+});
+
+// ─── Delete annonce ────────────────────────────────────────────────────────
+router.delete('/annonces/:id', async (req, res) => {
+  try {
+    const annonce = await Annonce.findByPk(req.params.id);
+    if (!annonce) {
+      return res.status(404).json({ message: 'Annonce introuvable.' });
+    }
+    await annonce.destroy();
+    res.json({ message: 'Annonce supprimée avec succès.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erreur lors de la suppression.' });
