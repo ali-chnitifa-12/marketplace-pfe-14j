@@ -10,6 +10,8 @@ import ResetPassword from './pages/ResetPassword';
 import CreateAnnonce from './pages/CreateAnnonce';
 import AnnonceDetails from './pages/AnnonceDetails';
 import Profile from './pages/Profile';
+import About from './pages/About';
+import ChatbotWidget from './components/ChatbotWidget';
 
 
 const PrivateRoute = ({ children }) => {
@@ -91,12 +93,18 @@ function App() {
                 <Profile />
               </PrivateRoute>
             } />
+            <Route path="/about" element={
+              <PrivateRoute>
+                <About />
+              </PrivateRoute>
+            } />
             <Route path="/" element={
               <PrivateRoute>
                 <Home />
               </PrivateRoute>
             } />
           </Routes>
+          <ChatbotWidget />
         </Router>
       </AuthProvider>
     </ThemeProvider>

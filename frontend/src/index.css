@@ -40,3 +40,25 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f97316;
+}
+
+/* Text Selection */
+::selection {
+  background: rgba(249, 115, 22, 0.3);
+  color: inherit;
+}

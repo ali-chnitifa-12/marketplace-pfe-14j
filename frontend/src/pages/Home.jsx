@@ -109,8 +109,13 @@ export default function Home() {
       {/* Navigation */}
       <nav ref={navRef} className="top-nav">
         <div className="nav-left">
-          <span className="nav-logo-icon">📍</span>
-          <span className="nav-logo-text">Products Marketplace</span>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}>
+            <span className="nav-logo-icon">📍</span>
+            <span className="nav-logo-text">Products Marketplace</span>
+          </Link>
+          <Link to="/about" className="nav-about-link" style={{ marginLeft: '20px', textDecoration: 'none', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>
+            À Propos
+          </Link>
         </div>
         
         <div className="nav-center">

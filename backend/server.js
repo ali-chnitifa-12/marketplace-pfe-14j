@@ -21,6 +21,7 @@ app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/offres', require('./routes/offres'));
 app.use('/api/commandes', require('./routes/commandes'));
 app.use('/api/encheres', require('./routes/encheres'));
+app.use('/api/chatbot', require('./routes/chatbot'));
 
 // Test route
 app.get('/', (req, res) => {
