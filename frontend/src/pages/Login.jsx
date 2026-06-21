@@ -200,7 +200,7 @@ export default function Login() {
 
         .login-page {
           min-height: 100vh;
-          background: #050816;
+          background-color: transparent;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -211,7 +211,7 @@ export default function Login() {
 
         .grid-bg {
           position: fixed; inset: 0;
-          background-image: radial-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+          background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px);
           background-size: 30px 30px;
           pointer-events: none;
         }
@@ -222,12 +222,12 @@ export default function Login() {
         }
         .orb-1 {
           width: 500px; height: 500px;
-          background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%); /* Orange */
+          background: radial-gradient(circle, var(--grid-dots-alt) 0%, transparent 70%); /* Orange */
           top: -100px; left: -100px;
         }
         .orb-2 {
           width: 400px; height: 400px;
-          background: radial-gradient(circle, rgba(20,184,166,0.25) 0%, transparent 70%); /* Teal */
+          background: radial-gradient(circle, var(--grid-dots) 0%, transparent 70%); /* Teal */
           bottom: -80px; right: -60px;
         }
         .orb-3 {
@@ -238,16 +238,16 @@ export default function Login() {
 
         .glass-card {
           position: relative; z-index: 10;
-          background: rgba(255,255,255,0.03);
+          background: var(--card-bg);
           backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.08);
+          border: 1px solid var(--card-border);
           border-radius: 28px;
           padding: 48px;
           width: 100%; max-width: 460px;
           box-shadow:
             0 0 0 1px rgba(249,115,22,0.15),
-            0 25px 80px rgba(0,0,0,0.5),
-            inset 0 1px 0 rgba(255,255,255,0.07);
+            0 25px 80px rgba(0,0,0,0.1),
+            inset 0 1px 0 var(--card-border-light);
           transform-style: preserve-3d;
         }
 
@@ -263,13 +263,13 @@ export default function Login() {
 
         .card-title-area { margin-bottom: 32px; }
         .card-title {
-          font-size: 30px; font-weight: 800; color: #f1f5f9; line-height: 1.2;
+          font-size: 30px; font-weight: 800; color: var(--text-primary); line-height: 1.2;
         }
-        .card-subtitle { font-size: 14px; color: #64748b; margin-top: 6px; }
+        .card-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
 
         .error-box {
           background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
-          color: #fca5a5; border-radius: 12px; padding: 12px 16px;
+          color: #ef4444; border-radius: 12px; padding: 12px 16px;
           font-size: 13px; margin-bottom: 20px;
         }
 
@@ -277,18 +277,19 @@ export default function Login() {
 
         .input-group label {
           display: block; font-size: 12px; font-weight: 600;
-          color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em;
+          color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em;
           margin-bottom: 8px;
         }
         .input-wrapper {
           display: flex; align-items: center; position: relative;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
+          background: var(--input-bg);
+          border: 1px solid var(--input-border);
           border-radius: 14px; overflow: hidden;
           transition: border-color 0.3s, box-shadow 0.3s;
         }
         .input-group.focused .input-wrapper {
           border-color: rgba(249,115,22,0.6);
+          background: var(--input-focus-bg);
           box-shadow: 0 0 0 3px rgba(249,115,22,0.12), 0 0 20px rgba(249,115,22,0.1);
         }
         .input-icon {
@@ -296,17 +297,17 @@ export default function Login() {
         }
         .input-wrapper input {
           flex: 1; background: transparent; border: none; outline: none;
-          color: #e2e8f0; font-size: 15px; padding: 14px 18px 14px 0;
+          color: var(--text-primary); font-size: 15px; padding: 14px 18px 14px 0;
           font-family: 'Inter', sans-serif;
         }
-        .input-wrapper input::placeholder { color: #334155; }
+        .input-wrapper input::placeholder { color: var(--text-secondary); }
 
         .forgot-row { text-align: right; }
         .forgot-link {
           font-size: 13px; color: #f97316; text-decoration: none; font-weight: 500;
           transition: color 0.2s;
         }
-        .forgot-link:hover { color: #fdba74; }
+        .forgot-link:hover { color: #ea580c; }
 
         .submit-btn {
           width: 100%; padding: 16px;
@@ -331,13 +332,13 @@ export default function Login() {
 
         .switch-auth {
           text-align: center; margin-top: 28px;
-          font-size: 13px; color: #475569;
+          font-size: 13px; color: var(--text-secondary);
         }
         .switch-link {
           color: #14b8a6; font-weight: 600; text-decoration: none;
           transition: color 0.2s;
         }
-        .switch-link:hover { color: #5eead4; }
+        .switch-link:hover { color: #0d9488; }
       `}</style>
     </div>
   );

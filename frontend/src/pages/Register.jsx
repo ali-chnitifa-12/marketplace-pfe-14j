@@ -250,7 +250,7 @@ export default function Register() {
 
         .register-page {
           min-height: 100vh;
-          background: #050816;
+          background-color: transparent;
           display: flex; align-items: center; justify-content: center;
           font-family: 'Inter', sans-serif;
           overflow: hidden; position: relative; padding: 20px;
@@ -258,23 +258,23 @@ export default function Register() {
 
         .grid-bg {
           position: fixed; inset: 0;
-          background-image: radial-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+          background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px);
           background-size: 30px 30px; pointer-events: none;
         }
 
         .orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
-        .orb-1 { width: 550px; height: 550px; background: radial-gradient(circle, rgba(20,184,166,0.3) 0%, transparent 70%); top: -120px; right: -100px; }
-        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%); bottom: -100px; left: -80px; }
+        .orb-1 { width: 550px; height: 550px; background: radial-gradient(circle, var(--grid-dots) 0%, transparent 70%); top: -120px; right: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, var(--grid-dots-alt) 0%, transparent 70%); bottom: -100px; left: -80px; }
         .orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(234,179,8,0.15) 0%, transparent 70%); top: 40%; left: 20%; }
 
         .glass-card {
           position: relative; z-index: 10;
-          background: rgba(255,255,255,0.03);
+          background: var(--card-bg);
           backdrop-filter: blur(24px);
-          border: 1px solid rgba(255,255,255,0.07);
+          border: 1px solid var(--card-border);
           border-radius: 28px; padding: 44px;
           width: 100%; max-width: 470px;
-          box-shadow: 0 0 0 1px rgba(20,184,166,0.12), 0 30px 90px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+          box-shadow: 0 0 0 1px rgba(20,184,166,0.12), 0 30px 90px rgba(0,0,0,0.1), inset 0 1px 0 var(--card-border-light);
           transform-style: preserve-3d;
         }
 
@@ -283,51 +283,51 @@ export default function Register() {
         .logo-text { font-size: 17px; font-weight: 700; background: linear-gradient(135deg, #14b8a6, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .card-title-area { margin-bottom: 24px; }
-        .card-title { font-size: 28px; font-weight: 800; color: #f1f5f9; }
-        .card-subtitle { font-size: 14px; color: #64748b; margin-top: 5px; }
+        .card-title { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+        .card-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 5px; }
 
         .progress-area { margin-bottom: 24px; }
-        .progress-track { height: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+        .progress-track { height: 4px; background: var(--card-border); border-radius: 10px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #14b8a6, #f97316); border-radius: 10px; transition: width 0.5s ease; }
-        .progress-label { font-size: 11px; color: #475569; margin-top: 6px; display: block; text-align: right; }
+        .progress-label { font-size: 11px; color: var(--text-secondary); margin-top: 6px; display: block; text-align: right; }
 
-        .error-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 12px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; }
+        .error-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; border-radius: 12px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; }
 
         .form-area { display: flex; flex-direction: column; gap: 18px; }
 
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-        .input-wrapper { display: flex; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; transition: all 0.3s; }
-        .input-group.focused .input-wrapper { border-color: rgba(20,184,166,0.6); box-shadow: 0 0 0 3px rgba(20,184,166,0.12), 0 0 20px rgba(20,184,166,0.08); }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+        .input-wrapper { display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px; overflow: hidden; transition: all 0.3s; }
+        .input-group.focused .input-wrapper { border-color: rgba(20,184,166,0.6); background: var(--input-focus-bg); box-shadow: 0 0 0 3px rgba(20,184,166,0.12), 0 0 20px rgba(20,184,166,0.08); }
         .input-icon { padding: 14px 12px 14px 16px; font-size: 16px; user-select: none; }
-        .input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: #e2e8f0; font-size: 15px; padding: 14px 8px; font-family: 'Inter', sans-serif; }
-        .input-wrapper input::placeholder { color: #1e293b; }
-        .check-icon { padding-right: 14px; color: #34d399; font-size: 16px; font-weight: 700; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 15px; padding: 14px 8px; font-family: 'Inter', sans-serif; }
+        .input-wrapper input::placeholder { color: var(--text-secondary); }
+        .check-icon { padding-right: 14px; color: #10b981; font-size: 16px; font-weight: 700; }
 
         .strength-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
         .strength-bar { height: 3px; flex: 1; border-radius: 10px; transition: background 0.3s; }
         .strength-bar.weak { background: #ef4444; width: 33%; }
         .strength-bar.medium { background: #f59e0b; width: 66%; }
-        .strength-bar.strong { background: #34d399; width: 100%; }
-        .strength-text { font-size: 11px; color: #64748b; white-space: nowrap; }
+        .strength-bar.strong { background: #10b981; width: 100%; }
+        .strength-text { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
 
         .account-type-group { margin-top: 4px; }
-        .account-type-group > label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+        .account-type-group > label { display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
         .segmented-control {
           display: flex; position: relative;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.07);
+          background: var(--input-bg);
+          border: 1px solid var(--input-border);
           border-radius: 12px; padding: 4px;
         }
         .segmented-control input[type="radio"] { display: none; }
         .segment-label {
           flex: 1; text-align: center; padding: 12px 8px;
-          font-size: 13px; font-weight: 600; color: #94a3b8;
+          font-size: 13px; font-weight: 600; color: var(--text-secondary);
           cursor: pointer; position: relative; z-index: 2;
           transition: color 0.3s;
           display: flex; align-items: center; justify-content: center; gap: 6px;
         }
         .segment-icon { font-size: 16px; opacity: 0.6; transition: opacity 0.3s; }
-        .segmented-control input[type="radio"]:checked + .segment-label { color: #fff; }
+        .segmented-control input[type="radio"]:checked + .segment-label { color: var(--text-primary); }
         .segmented-control input[type="radio"]:checked + .segment-label .segment-icon { opacity: 1; }
         
         .segment-indicator {
@@ -351,11 +351,11 @@ export default function Register() {
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .features-row { display: flex; gap: 10px; margin-top: 24px; justify-content: center; flex-wrap: wrap; }
-        .feature-badge { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; font-size: 12px; padding: 5px 12px; border-radius: 100px; }
+        .feature-badge { background: var(--card-bg-hover); border: 1px solid var(--card-border); color: var(--text-secondary); font-size: 12px; padding: 5px 12px; border-radius: 100px; }
 
-        .switch-auth { text-align: center; margin-top: 20px; font-size: 13px; color: #475569; }
+        .switch-auth { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-secondary); }
         .switch-link { color: #f97316; font-weight: 600; text-decoration: none; transition: color 0.2s; }
-        .switch-link:hover { color: #fdba74; }
+        .switch-link:hover { color: #ea580c; }
       `}</style>
     </div>
   );
