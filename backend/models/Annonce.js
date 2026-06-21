@@ -57,6 +57,15 @@ const Annonce = sequelize.define('Annonce', {
       }
     }
   },
+  typeAnnonce: {
+    type: DataTypes.ENUM('Fixe', 'Enchere'),
+    defaultValue: 'Fixe',
+    allowNull: false
+  },
+  isFlagged: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
   latitude: {
     type: DataTypes.FLOAT,
     allowNull: true,

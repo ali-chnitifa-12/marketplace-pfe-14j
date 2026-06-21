@@ -5,6 +5,8 @@ const Annonce = require('./Annonce');
 const Favori = require('./Favori');
 const Review = require('./Review');
 const Offre = require('./Offre');
+const Commande = require('./Commande');
+const Enchere = require('./Enchere');
 
 module.exports = {
   sequelize,
@@ -12,5 +14,7 @@ module.exports = {
   Annonce,
   Favori,
   Review,
-  Offre
+  Offre,
+  Commande,
+  Enchere
 };

@@ -10,6 +10,8 @@ export default function Profile() {
   const [favoris, setFavoris] = useState([]);
   const [mesAnnonces, setMesAnnonces] = useState([]);
   const [offresRecues, setOffresRecues] = useState([]);
+  const [mesCommandes, setMesCommandes] = useState([]);
+  const [commandesRecues, setCommandesRecues] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Form states
@@ -29,17 +31,20 @@ export default function Profile() {
       
       const resFav = await axios.get('http://localhost:5000/api/favoris', { headers });
       setFavoris(resFav.data);
+
+      const resCmd = await axios.get('http://localhost:5000/api/commandes/mes-commandes', { headers });
+      setMesCommandes(resCmd.data);
       
       if (user?.typeCompte === 'vendeur') {
         const resAnn = await axios.get(`http://localhost:5000/api/annonces?userId=${user.id}`);
-        // Alternatively filter from all, but backend /api/annonces handles it if we pass userId?
-        // Wait, standard route is to filter frontend or create a specific route.
-        // Let's filter on frontend for simplicity here from all annonces:
         const allAnn = await axios.get('http://localhost:5000/api/annonces');
         setMesAnnonces(allAnn.data.filter(a => a.userId === user.id));
         
         const resOffres = await axios.get('http://localhost:5000/api/offres/recues', { headers });
         setOffresRecues(resOffres.data);
+
+        const resCmdRecues = await axios.get('http://localhost:5000/api/commandes/vendeur', { headers });
+        setCommandesRecues(resCmdRecues.data);
       }
     } catch (err) {
       console.error(err);

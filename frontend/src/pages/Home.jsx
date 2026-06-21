@@ -14,6 +14,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categorie, setCategorie] = useState('');
+  const [minPrix, setMinPrix] = useState('');
+  const [maxPrix, setMaxPrix] = useState('');
 
   const containerRef = useRef(null);
   const navRef = useRef(null);
@@ -35,7 +37,7 @@ export default function Home() {
     try {
       setLoading(true);
       const res = await axios.get('http://localhost:5000/api/annonces', {
-        params: { search, categorie }
+        params: { search, categorie, minPrix, maxPrix }
       });
       setAnnonces(res.data);
     } catch (err) {
@@ -47,7 +49,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchAnnonces();
-  }, [search, categorie]);
+  }, [search, categorie, minPrix, maxPrix]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -147,16 +149,23 @@ export default function Home() {
         {/* Header & Categories */}
         <section ref={headerRef} className="feed-header">
           <h1 className="feed-title">Découvrez les annonces récentes</h1>
-          <div className="categories-filter">
-            {categories.map((cat) => (
-              <button 
-                key={cat.id} 
-                onClick={() => setCategorie(cat.id)}
-                className={`category-pill ${categorie === cat.id ? 'active' : ''}`}
-              >
-                {cat.label}
-              </button>
-            ))}
+          <div className="filters-row">
+            <div className="categories-filter">
+              {categories.map((cat) => (
+                <button 
+                  key={cat.id} 
+                  onClick={() => setCategorie(cat.id)}
+                  className={`category-pill ${categorie === cat.id ? 'active' : ''}`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+            <div className="price-filters">
+              <input type="number" placeholder="Prix Min" value={minPrix} onChange={(e) => setMinPrix(e.target.value)} className="price-input" />
+              <span>-</span>
+              <input type="number" placeholder="Prix Max" value={maxPrix} onChange={(e) => setMaxPrix(e.target.value)} className="price-input" />
+            </div>
           </div>
         </section>
 
@@ -300,8 +309,16 @@ export default function Home() {
         /* ─── Feed Header ─── */
         .feed-header { margin-bottom: 30px; }
         .feed-title { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; }
-        .categories-filter { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .filters-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 10px; }
+        .categories-filter { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; flex: 1; }
         .categories-filter::-webkit-scrollbar { display: none; }
+        .price-filters { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+        .price-input {
+          width: 90px; padding: 6px 12px; border-radius: 8px;
+          border: 1px solid var(--card-border); background: var(--card-bg);
+          color: var(--text-primary); outline: none; font-family: 'Inter', sans-serif;
+        }
+        .price-input:focus { border-color: #14b8a6; }
         .category-pill {
           background: var(--card-bg); border: 1px solid var(--card-border);
           color: var(--text-secondary); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;

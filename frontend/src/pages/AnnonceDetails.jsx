@@ -108,6 +108,42 @@ export default function AnnonceDetails() {
     }
   };
 
+  const [showCommandeModal, setShowCommandeModal] = useState(false);
+  const [commandeData, setCommandeData] = useState({ adresseLivraison: '', telephone: '', modeLivraison: 'Domicile', pointRelaisId: '' });
+  
+  const handleMakeCommande = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/commandes', {
+        annonceId: id, ...commandeData
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setShowCommandeModal(false);
+      setActionMsg('Commande confirmée (Paiement à la livraison) !');
+      setTimeout(() => { setActionMsg(''); fetchAnnonceAndData(); }, 3000);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
+  const [showEnchereModal, setShowEnchereModal] = useState(false);
+  const [encherePrix, setEncherePrix] = useState('');
+
+  const handleMakeEnchere = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/encheres', {
+        annonceId: id, montant: parseFloat(encherePrix)
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setShowEnchereModal(false);
+      setActionMsg('Enchère placée avec succès !');
+      setTimeout(() => { setActionMsg(''); fetchAnnonceAndData(); }, 3000);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
   const handlePostReview = async (e) => {
     e.preventDefault();
     try {
@@ -222,12 +258,23 @@ export default function AnnonceDetails() {
                 <a href={waLink} target="_blank" rel="noreferrer" className="contact-btn">
                   <span>💬</span> WhatsApp
                 </a>
-                <button onClick={() => setShowOffreModal(true)} className="offer-btn">
-                  <span>💰</span> Faire une offre
-                </button>
+                {annonce.typeAnnonce === 'Enchere' ? (
+                  <button onClick={() => setShowEnchereModal(true)} className="offer-btn">
+                    <span>🔨</span> Placer une enchère
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={() => setShowCommandeModal(true)} className="offer-btn" style={{background: '#14b8a6', color: 'white', borderColor: '#14b8a6'}}>
+                      <span>🛒</span> Acheter direct
+                    </button>
+                    <button onClick={() => setShowOffreModal(true)} className="offer-btn">
+                      <span>💰</span> Négocier
+                    </button>
+                  </>
+                )}
               </>
             )}
-            {!user && <p className="text-small">Connectez-vous pour contacter le vendeur.</p>}
+            {!user && <p className="text-small">Connectez-vous pour contacter le vendeur ou acheter.</p>}
           </div>
 
           <div className="details-seller-card">
@@ -277,6 +324,54 @@ export default function AnnonceDetails() {
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowOffreModal(false)} className="btn-cancel">Annuler</button>
                 <button type="submit" className="btn-submit">Envoyer l'offre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showCommandeModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card" style={{ maxWidth: '500px' }}>
+            <h2>🛒 Finaliser la commande</h2>
+            <p>Total à payer à la livraison : <strong>{annonce.prix} DH</strong></p>
+            <form onSubmit={handleMakeCommande}>
+              <select value={commandeData.modeLivraison} onChange={e => setCommandeData({...commandeData, modeLivraison: e.target.value})} style={{width:'100%', padding:'15px', marginBottom:'15px', borderRadius:'12px', background:'var(--input-bg)', border:'1px solid var(--input-border)', color:'var(--text-primary)'}}>
+                <option value="Domicile">Livraison à Domicile</option>
+                <option value="Point Relais">Livraison en Point Relais</option>
+              </select>
+              
+              {commandeData.modeLivraison === 'Point Relais' && (
+                <select value={commandeData.pointRelaisId} onChange={e => setCommandeData({...commandeData, pointRelaisId: e.target.value})} required style={{width:'100%', padding:'15px', marginBottom:'15px', borderRadius:'12px', background:'var(--input-bg)', border:'1px solid var(--input-border)', color:'var(--text-primary)'}}>
+                  <option value="">-- Choisissez un Point Relais --</option>
+                  <option value="Relais 1 (Gare Casa Voyageurs)">Gare Casa Voyageurs (Casablanca)</option>
+                  <option value="Relais 2 (Gare Rabat Agdal)">Gare Rabat Agdal (Rabat)</option>
+                  <option value="Relais 3 (Marjane Marrakech)">Marjane Menara (Marrakech)</option>
+                </select>
+              )}
+
+              <input type="text" value={commandeData.adresseLivraison} onChange={e => setCommandeData({...commandeData, adresseLivraison: e.target.value})} placeholder="Adresse complète" required />
+              <input type="tel" value={commandeData.telephone} onChange={e => setCommandeData({...commandeData, telephone: e.target.value})} placeholder="Numéro de téléphone" required />
+              
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowCommandeModal(false)} className="btn-cancel">Annuler</button>
+                <button type="submit" className="btn-submit" style={{background:'#14b8a6'}}>Commander</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEnchereModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card">
+            <h2>🔨 Placer une enchère</h2>
+            <p>Prix de départ : <strong>{annonce.prix} DH</strong></p>
+            <form onSubmit={handleMakeEnchere}>
+              <input type="number" value={encherePrix} onChange={e => setEncherePrix(e.target.value)} placeholder="Votre enchère (DH)" required min={annonce.prix + 1} />
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowEnchereModal(false)} className="btn-cancel">Annuler</button>
+                <button type="submit" className="btn-submit" style={{background:'#f97316'}}>Enchérir</button>
               </div>
             </form>
           </div>

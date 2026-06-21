@@ -13,6 +13,7 @@ export default function CreateAnnonce() {
   const [prix, setPrix] = useState('');
   const [etat, setEtat] = useState('Bon état');
   const [categorie, setCategorie] = useState('Électronique');
+  const [typeAnnonce, setTypeAnnonce] = useState('Fixe');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [latitude, setLatitude] = useState(null);
@@ -64,6 +65,7 @@ export default function CreateAnnonce() {
       formData.append('prix', prix);
       formData.append('etat', etat);
       formData.append('categorie', categorie);
+      formData.append('typeAnnonce', typeAnnonce);
       
       if (imageFile) {
         formData.append('image', imageFile);
@@ -138,6 +140,14 @@ export default function CreateAnnonce() {
                 <option value="Maison">Maison & Déco</option>
                 <option value="Véhicules">Véhicules</option>
                 <option value="Services">Services</option>
+              </select>
+            </div>
+
+            <div className="form-group half">
+              <label>Type de vente</label>
+              <select value={typeAnnonce} onChange={(e) => setTypeAnnonce(e.target.value)}>
+                <option value="Fixe">Prix Fixe</option>
+                <option value="Enchere">Enchère</option>
               </select>
             </div>
           </div>

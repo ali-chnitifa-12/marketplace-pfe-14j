@@ -19,6 +19,8 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/favoris', require('./routes/favoris'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/offres', require('./routes/offres'));
+app.use('/api/commandes', require('./routes/commandes'));
+app.use('/api/encheres', require('./routes/encheres'));
 
 // Test route
 app.get('/', (req, res) => {

@@ -83,7 +83,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       }
     }
 
-    const { titre, description, prix, etat, categorie, latitude, longitude } = req.body;
+    const { titre, description, prix, etat, categorie, latitude, longitude, typeAnnonce } = req.body;
     let images = [];
 
     // Si on reçoit un fichier uploadé
@@ -95,12 +95,19 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
     }
 
+    // "AI" Moderation simulation
+    const forbiddenWords = ['arnaque', 'insulte', 'faux', 'escroc'];
+    const textToCheck = (titre + ' ' + description).toLowerCase();
+    const isFlagged = forbiddenWords.some(word => textToCheck.includes(word));
+
     const nouvelleAnnonce = await Annonce.create({
       titre,
       description,
       prix: parseFloat(prix),
       etat,
       categorie,
+      typeAnnonce: typeAnnonce || 'Fixe',
+      isFlagged,
       images,
       latitude: latitude ? parseFloat(latitude) : null,
       longitude: longitude ? parseFloat(longitude) : null,
