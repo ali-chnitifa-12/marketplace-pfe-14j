@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import gsap from 'gsap';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function Home() {
   const { user, logout } = useContext(AuthContext);
+  const { isLightMode, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
   const [annonces, setAnnonces] = useState([]);
@@ -123,6 +125,9 @@ export default function Home() {
         </div>
 
         <div className="nav-right">
+          <button onClick={toggleTheme} className="nav-theme-btn" title="Toggle Light/Dark Mode">
+            {isLightMode ? '🌙' : '☀️'}
+          </button>
           {user?.typeCompte === 'vendeur' && (
             <Link to="/create-annonce" className="publish-btn">
               <span>➕</span> Publier
@@ -203,7 +208,7 @@ export default function Home() {
 
         .home-page {
           min-height: 100vh;
-          background: #050816;
+          background-color: transparent;
           font-family: 'Inter', sans-serif;
           overflow-x: hidden;
           position: relative;
@@ -212,12 +217,12 @@ export default function Home() {
         /* ─── Background ─── */
         .grid-bg {
           position: fixed; inset: 0;
-          background-image: radial-gradient(rgba(20, 184, 166, 0.08) 1px, transparent 1px);
+          background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px);
           background-size: 40px 40px; pointer-events: none; z-index: 0;
         }
         .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
-        .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, transparent 70%); top: -200px; left: -150px; }
-        .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%); bottom: -150px; right: -100px; }
+        .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, var(--grid-dots-alt) 0%, transparent 70%); top: -200px; left: -150px; }
+        .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, var(--grid-dots) 0%, transparent 70%); bottom: -150px; right: -100px; }
         .orb-3 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(167,139,250,0.12) 0%, transparent 70%); top: 40%; right: 20%; }
 
         /* ─── Navigation ─── */
@@ -225,9 +230,9 @@ export default function Home() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           display: flex; align-items: center; justify-content: space-between;
           padding: 14px 32px;
-          background: rgba(5,8,22,0.8);
+          background: var(--overlay-bg);
           backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 1px solid var(--card-border);
         }
         .nav-left { display: flex; align-items: center; gap: 10px; width: 250px; }
         .nav-logo-icon { font-size: 22px; }
@@ -236,24 +241,31 @@ export default function Home() {
         .nav-center { flex: 1; display: flex; justify-content: center; max-width: 600px; margin: 0 20px; }
         .search-bar-container {
           width: 100%; display: flex; align-items: center;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
+          background: var(--input-bg);
+          border: 1px solid var(--input-border);
           border-radius: 100px; padding: 6px 16px;
           transition: all 0.3s;
         }
         .search-bar-container:focus-within {
-          background: rgba(255,255,255,0.06);
+          background: var(--input-focus-bg);
           border-color: rgba(20,184,166,0.5);
           box-shadow: 0 0 0 3px rgba(20,184,166,0.15);
         }
-        .search-icon { font-size: 14px; opacity: 0.5; margin-right: 10px; }
+        .search-icon { font-size: 14px; opacity: 0.5; margin-right: 10px; color: var(--text-primary); }
         .search-input {
           flex: 1; background: transparent; border: none; outline: none;
-          color: #f1f5f9; font-size: 14px; padding: 6px 0;
+          color: var(--text-primary); font-size: 14px; padding: 6px 0;
           font-family: 'Inter', sans-serif;
         }
 
         .nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; width: 250px; }
+        .nav-theme-btn {
+          background: var(--card-bg); border: 1px solid var(--card-border);
+          border-radius: 50%; width: 38px; height: 38px;
+          color: var(--text-primary); font-size: 16px; cursor: pointer; transition: all 0.3s;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .nav-theme-btn:hover { background: var(--card-bg-hover); }
         .publish-btn {
           display: flex; align-items: center; gap: 6px;
           background: linear-gradient(135deg, #f97316, #ea580c);
@@ -265,7 +277,7 @@ export default function Home() {
         .publish-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
         .nav-user-pill {
           display: flex; align-items: center;
-          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+          background: var(--card-bg); border: 1px solid var(--card-border-light);
           border-radius: 100px; padding: 4px;
         }
         .nav-user-avatar {
@@ -287,16 +299,16 @@ export default function Home() {
 
         /* ─── Feed Header ─── */
         .feed-header { margin-bottom: 30px; }
-        .feed-title { font-size: 28px; font-weight: 800; color: #f1f5f9; margin-bottom: 20px; }
+        .feed-title { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; }
         .categories-filter { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .categories-filter::-webkit-scrollbar { display: none; }
         .category-pill {
-          background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-          color: #94a3b8; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
+          background: var(--card-bg); border: 1px solid var(--card-border);
+          color: var(--text-secondary); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
           padding: 8px 18px; border-radius: 100px; cursor: pointer;
           white-space: nowrap; transition: all 0.3s;
         }
-        .category-pill:hover { background: rgba(255,255,255,0.06); color: #cbd5e1; }
+        .category-pill:hover { background: var(--card-bg-hover); color: var(--text-primary); }
         .category-pill.active {
           background: rgba(20,184,166,0.15); border-color: rgba(20,184,166,0.4);
           color: #2dd4bf;
@@ -310,51 +322,51 @@ export default function Home() {
         }
         .loading-state, .empty-state {
           grid-column: 1 / -1; text-align: center; padding: 80px 20px;
-          color: #64748b; font-weight: 500;
+          color: var(--text-secondary); font-weight: 500;
         }
         .spinner { display: inline-block; animation: spin 1s linear infinite; font-size: 20px; margin-right: 8px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.8; }
-        .empty-state h3 { font-size: 20px; color: #cbd5e1; margin-bottom: 8px; }
+        .empty-state h3 { font-size: 20px; color: var(--text-primary); margin-bottom: 8px; }
 
         /* ─── Annonce Card ─── */
         .annonce-card {
-          background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+          background: var(--card-bg); border: 1px solid var(--card-border);
           border-radius: 20px; overflow: hidden; text-decoration: none;
           display: flex; flex-direction: column; transition: all 0.3s;
         }
         .annonce-card:hover {
-          transform: translateY(-4px); background: rgba(255,255,255,0.04);
-          border-color: rgba(255,255,255,0.1); box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+          transform: translateY(-4px); background: var(--card-bg-hover);
+          border-color: var(--card-border-light); box-shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
         .annonce-image-placeholder {
-          height: 180px; background: rgba(0,0,0,0.2); position: relative;
+          height: 180px; background: var(--card-bg-hover); position: relative;
           display: flex; align-items: center; justify-content: center;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
+          border-bottom: 1px solid var(--card-border);
           overflow: hidden;
         }
         .annonce-img { width: 100%; height: 100%; object-fit: cover; }
         .no-image-icon { font-size: 40px; opacity: 0.2; }
         .annonce-price {
           position: absolute; bottom: 12px; right: 12px;
-          background: rgba(5,8,22,0.85); backdrop-filter: blur(8px);
+          background: var(--overlay-bg); backdrop-filter: blur(8px);
           color: #2dd4bf; font-weight: 800; font-size: 15px;
           padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(45,212,191,0.3);
         }
         .annonce-content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
         .annonce-category { font-size: 11px; font-weight: 700; color: #f97316; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-        .annonce-titre { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; line-height: 1.4; }
-        .annonce-desc { font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 20px; flex: 1; }
+        .annonce-titre { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4; }
+        .annonce-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; flex: 1; }
         
         .annonce-footer {
           display: flex; align-items: center; justify-content: space-between;
-          border-top: 1px solid rgba(255,255,255,0.05); padding-top: 14px;
+          border-top: 1px solid var(--card-border); padding-top: 14px;
         }
         .annonce-etat {
-          background: rgba(255,255,255,0.05); color: #cbd5e1;
+          background: var(--card-bg-hover); color: var(--text-primary);
           font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
         }
-        .annonce-seller { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; font-weight: 500; }
+        .annonce-seller { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
         .seller-avatar-small {
           width: 20px; height: 20px; border-radius: 50%;
           background: #334155; color: white; font-size: 9px; font-weight: 700;

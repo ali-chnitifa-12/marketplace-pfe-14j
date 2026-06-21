@@ -221,33 +221,33 @@ export default function CreateAnnonce() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         .create-page {
-          min-height: 100vh; background: #050816; font-family: 'Inter', sans-serif;
+          min-height: 100vh; background-color: transparent; font-family: 'Inter', sans-serif;
           display: flex; justify-content: center; align-items: flex-start;
           padding: 60px 20px; position: relative;
         }
         .grid-bg {
-          position: fixed; inset: 0; background-image: radial-gradient(rgba(249,115,22,0.1) 1px, transparent 1px);
+          position: fixed; inset: 0; background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px);
           background-size: 40px 40px; pointer-events: none;
         }
         
         .form-card {
           width: 100%; max-width: 600px;
-          background: rgba(255,255,255,0.02); backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.08); border-radius: 24px;
+          background: var(--card-bg); backdrop-filter: blur(20px);
+          border: 1px solid var(--card-border); border-radius: 24px;
           padding: 40px; position: relative; z-index: 10;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.1), inset 0 1px 0 var(--card-border-light);
         }
 
         .geo-btn { width: 100%; padding: 14px; background: rgba(20,184,166,0.1); border: 1px dashed rgba(20,184,166,0.4); color: #5eead4; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .geo-btn:hover { background: rgba(20,184,166,0.2); }
         .geo-btn.success { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.4); color: #4ade80; border-style: solid; }
 
-        .back-link { color: #94a3b8; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-block; margin-bottom: 24px; transition: color 0.2s; }
-        .back-link:hover { color: #f1f5f9; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; display: inline-block; margin-bottom: 24px; transition: color 0.2s; }
+        .back-link:hover { color: var(--text-primary); }
 
         .form-header { margin-bottom: 30px; }
-        .form-header h2 { font-size: 28px; font-weight: 800; color: #f1f5f9; margin-bottom: 8px; }
-        .form-header p { color: #64748b; font-size: 14px; }
+        .form-header h2 { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+        .form-header p { color: var(--text-secondary); font-size: 14px; }
 
         .error-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; padding: 12px 16px; border-radius: 12px; font-size: 13px; margin-bottom: 24px; }
 
@@ -255,29 +255,29 @@ export default function CreateAnnonce() {
         .form-row { display: flex; gap: 16px; }
         .form-group.half { flex: 1; }
 
-        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
         .form-group input, .form-group textarea, .form-group select {
-          width: 100%; background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-          padding: 14px 16px; color: #f1f5f9; font-size: 15px; font-family: 'Inter', sans-serif;
+          width: 100%; background: var(--input-bg);
+          border: 1px solid var(--input-border); border-radius: 12px;
+          padding: 14px 16px; color: var(--text-primary); font-size: 15px; font-family: 'Inter', sans-serif;
           transition: all 0.2s; outline: none;
         }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-          border-color: rgba(249,115,22,0.5); background: rgba(255,255,255,0.06);
+          border-color: rgba(249,115,22,0.5); background: var(--input-focus-bg);
           box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
         }
         .form-group select { appearance: none; cursor: pointer; }
-        .help-text { display: block; margin-top: 6px; font-size: 11px; color: #475569; }
+        .help-text { display: block; margin-top: 6px; font-size: 11px; color: var(--text-secondary); }
 
         .etat-selector { display: flex; flex-wrap: wrap; gap: 8px; }
         .etat-option {
-          background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-          padding: 8px 14px; border-radius: 100px; font-size: 13px; color: #cbd5e1;
+          background: var(--card-bg); border: 1px solid var(--card-border);
+          padding: 8px 14px; border-radius: 100px; font-size: 13px; color: var(--text-secondary);
           cursor: pointer; transition: all 0.2s; font-weight: 500;
         }
-        .etat-option:hover { background: rgba(255,255,255,0.06); }
+        .etat-option:hover { background: var(--card-bg-hover); color: var(--text-primary); }
         .etat-option.selected {
-          background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.5); color: #fdba74;
+          background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.5); color: #ea580c; font-weight: 700;
         }
         .hidden-radio { display: none; }
 

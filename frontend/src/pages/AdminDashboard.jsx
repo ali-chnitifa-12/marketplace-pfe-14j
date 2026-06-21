@@ -158,45 +158,45 @@ export default function AdminDashboard() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         
-        .admin-page { min-height: 100vh; background: #050816; color: #f1f5f9; padding: 40px 20px; font-family: 'Inter', sans-serif; }
-        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(rgba(167,139,250,0.1) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+        .admin-page { min-height: 100vh; background-color: transparent; color: var(--text-primary); padding: 40px 20px; font-family: 'Inter', sans-serif; }
+        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
         .admin-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; }
         
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .admin-header h1 { font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
-        .btn-logout { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+        .btn-logout { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.2); padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-logout:hover { background: rgba(239,68,68,0.2); }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 24px; border-radius: 20px; text-align: center; }
-        .stat-card h3 { font-size: 14px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 24px; border-radius: 20px; text-align: center; }
+        .stat-card h3 { font-size: 14px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
         .stat-value { font-size: 48px; font-weight: 900; margin: 0; }
-        .text-purple { color: #a78bfa; }
-        .text-green { color: #34d399; }
-        .text-red { color: #f87171; }
+        .text-purple { color: #8b5cf6; }
+        .text-green { color: #10b981; }
+        .text-red { color: #ef4444; }
 
-        .glass-card { background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 30px; }
-        .users-section h2 { margin-bottom: 20px; font-size: 20px; }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; padding: 30px; }
+        .users-section h2 { margin-bottom: 20px; font-size: 20px; color: var(--text-primary); }
 
         .table-responsive { overflow-x: auto; }
         .admin-table { width: 100%; border-collapse: collapse; }
-        .admin-table th, .admin-table td { padding: 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .admin-table th { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .admin-table th, .admin-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--card-border); color: var(--text-primary); }
+        .admin-table th { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
         .admin-table td { font-size: 14px; }
 
-        .badge { padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .badge.admin { background: rgba(167,139,250,0.2); color: #c4b5fd; }
-        .badge.user { background: rgba(255,255,255,0.1); color: #cbd5e1; }
-        .badge.active { background: rgba(52,211,153,0.2); color: #6ee7b7; }
-        .badge.banned { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .badge { padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge.admin { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+        .badge.user { background: var(--card-bg-hover); color: var(--text-secondary); border: 1px solid var(--card-border); }
+        .badge.active { background: rgba(16,185,129,0.15); color: #10b981; }
+        .badge.banned { background: rgba(239,68,68,0.15); color: #ef4444; }
 
         .action-buttons { display: flex; gap: 8px; }
         .action-buttons button { border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-role { background: rgba(167,139,250,0.15); color: #c4b5fd; }
-        .btn-ban { background: rgba(245,158,11,0.15); color: #fcd34d; }
-        .btn-ban.unban { background: rgba(52,211,153,0.15); color: #6ee7b7; }
-        .btn-delete { background: rgba(239,68,68,0.15); color: #fca5a5; }
-        .action-buttons button:hover { filter: brightness(1.2); }
+        .btn-role { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+        .btn-ban { background: rgba(245,158,11,0.1); color: #d97706; }
+        .btn-ban.unban { background: rgba(16,185,129,0.1); color: #10b981; }
+        .btn-delete { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .action-buttons button:hover { filter: brightness(0.9); }
       `}</style>
     </div>
   );

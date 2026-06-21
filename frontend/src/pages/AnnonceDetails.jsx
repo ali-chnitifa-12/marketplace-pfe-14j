@@ -286,26 +286,26 @@ export default function AnnonceDetails() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
-        .details-page { min-height: 100vh; background: #050816; font-family: 'Inter', sans-serif; color: #f1f5f9; padding: 40px 20px; position: relative; }
-        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(rgba(20,184,166,0.08) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+        .details-page { min-height: 100vh; background-color: transparent; font-family: 'Inter', sans-serif; color: var(--text-primary); padding: 40px 20px; position: relative; }
+        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
         .loading-center, .error-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { font-size: 24px; display: inline-block; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .details-nav { max-width: 1100px; margin: 0 auto 30px; position: relative; z-index: 10; display: flex; justify-content: space-between; }
-        .back-link { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
-        .back-link:hover { color: #f1f5f9; }
+        .back-link { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .back-link:hover { color: var(--text-primary); }
         .action-msg { background: rgba(34,197,94,0.2); color: #4ade80; padding: 6px 12px; border-radius: 8px; font-size: 13px; }
 
         .details-content { max-width: 1100px; margin: 0 auto; position: relative; z-index: 10; display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
-        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 32px; }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; padding: 32px; }
 
-        .details-image-section { border-radius: 24px; overflow: hidden; background: rgba(0,0,0,0.3); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); }
+        .details-image-section { border-radius: 24px; overflow: hidden; background: var(--card-bg-hover); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 30px; border: 1px solid var(--card-border); }
         .main-image { width: 100%; height: 100%; object-fit: cover; }
-        .no-image-large { text-align: center; color: #475569; }
+        .no-image-large { text-align: center; color: var(--text-secondary); }
         .no-image-large .no-image-icon { font-size: 64px; opacity: 0.3; display: block; margin-bottom: 10px; }
         
-        .fav-btn { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); border: none; font-size: 24px; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); transition: 0.2s; }
+        .fav-btn { position: absolute; top: 20px; right: 20px; background: var(--overlay-bg); border: none; font-size: 24px; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); transition: 0.2s; }
         .fav-btn:hover { transform: scale(1.1); }
         .fav-btn.active { background: rgba(239,68,68,0.2); }
 
@@ -320,45 +320,45 @@ export default function AnnonceDetails() {
         .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
         .contact-btn { flex: 1; background: linear-gradient(135deg, #25D366, #128C7E); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px; box-shadow: 0 10px 25px rgba(37,211,102,0.3); transition: 0.2s; }
         .contact-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(37,211,102,0.4); }
-        .offer-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .offer-btn:hover { background: rgba(255,255,255,0.1); }
-        .text-small { font-size: 13px; color: #64748b; }
+        .offer-btn { flex: 1; background: var(--card-bg-hover); border: 1px solid var(--card-border-light); color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .offer-btn:hover { background: var(--card-border); }
+        .text-small { font-size: 13px; color: var(--text-secondary); }
 
-        .details-seller-card { display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 20px; border-radius: 20px; margin-bottom: 30px; }
-        .seller-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #14b8a6); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; overflow: hidden; }
-        .seller-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-        .seller-info p { font-size: 13px; color: #94a3b8; margin: 0; }
+        .details-seller-card { display: flex; align-items: center; gap: 16px; background: var(--card-bg); border: 1px solid var(--card-border); padding: 20px; border-radius: 20px; margin-bottom: 30px; }
+        .seller-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #14b8a6); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; overflow: hidden; color: white; }
+        .seller-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .seller-info p { font-size: 13px; color: var(--text-secondary); margin: 0; }
 
-        .reviews-section { background: rgba(0,0,0,0.2); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .reviews-section h3 { font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .reviews-section { background: var(--card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--card-border); }
+        .reviews-section h3 { font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; color: var(--text-primary); }
         .reviews-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
-        .review-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; }
-        .review-item strong { display: block; font-size: 14px; margin-bottom: 5px; }
+        .review-item { background: var(--card-bg-hover); padding: 15px; border-radius: 12px; }
+        .review-item strong { display: block; font-size: 14px; margin-bottom: 5px; color: var(--text-primary); }
         .stars { font-size: 12px; margin-bottom: 8px; display: block; }
-        .review-item p { font-size: 14px; color: #cbd5e1; margin: 0; }
+        .review-item p { font-size: 14px; color: var(--text-secondary); margin: 0; }
         
-        .review-form { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .review-form h4 { font-size: 14px; margin-bottom: 15px; }
-        .review-form select, .review-form textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
+        .review-form { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--card-border); }
+        .review-form h4 { font-size: 14px; margin-bottom: 15px; color: var(--text-primary); }
+        .review-form select, .review-form textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 10px; color: var(--text-primary); margin-bottom: 10px; font-family: 'Inter', sans-serif; }
         .review-form button { background: #f97316; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        .details-description h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
-        .details-description p { font-size: 16px; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; margin-bottom: 32px; }
+        .details-description h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+        .details-description p { font-size: 16px; color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap; margin-bottom: 32px; }
         
         .details-map-section { margin-bottom: 32px; }
-        .details-map-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
-        .map-container { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .details-map-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+        .map-container { border-radius: 16px; overflow: hidden; border: 1px solid var(--card-border); }
 
-        .details-meta { font-size: 13px; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .details-meta { font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; border-top: 1px solid var(--card-border); padding-top: 20px; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .modal-overlay { position: fixed; inset: 0; background: var(--overlay-bg); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }
         .modal-content { width: 100%; max-width: 400px; padding: 40px; text-align: center; }
-        .modal-content h2 { margin-bottom: 10px; }
-        .modal-content p { color: #94a3b8; margin-bottom: 20px; }
-        .modal-content input { width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(20,184,166,0.3); border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin-bottom: 20px; outline: none; }
+        .modal-content h2 { margin-bottom: 10px; color: var(--text-primary); }
+        .modal-content p { color: var(--text-secondary); margin-bottom: 20px; }
+        .modal-content input { width: 100%; padding: 15px; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; color: var(--text-primary); font-size: 18px; text-align: center; margin-bottom: 20px; outline: none; }
         .modal-content input:focus { border-color: #14b8a6; }
         .modal-actions { display: flex; gap: 10px; }
-        .btn-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 10px; cursor: pointer; }
+        .btn-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary); border-radius: 10px; cursor: pointer; }
         .btn-submit { flex: 1; padding: 12px; background: #14b8a6; border: none; color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
         @media (max-width: 900px) {
