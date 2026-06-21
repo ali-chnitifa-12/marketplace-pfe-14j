@@ -13,7 +13,8 @@ export default function CreateAnnonce() {
   const [prix, setPrix] = useState('');
   const [etat, setEtat] = useState('Bon état');
   const [categorie, setCategorie] = useState('Électronique');
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,18 @@ export default function CreateAnnonce() {
     return () => ctx.revert();
   }, [user, navigate]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,17 +57,27 @@ export default function CreateAnnonce() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/annonces', {
-        titre,
-        description,
-        prix: parseFloat(prix),
-        etat,
-        categorie,
-        images: imageUrl ? [imageUrl] : [],
-        latitude,
-        longitude
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      
+      const formData = new FormData();
+      formData.append('titre', titre);
+      formData.append('description', description);
+      formData.append('prix', prix);
+      formData.append('etat', etat);
+      formData.append('categorie', categorie);
+      
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+      if (latitude && longitude) {
+        formData.append('latitude', latitude);
+        formData.append('longitude', longitude);
+      }
+
+      await axios.post('http://localhost:5000/api/annonces', formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       
       gsap.to(cardRef.current, { scale: 0.95, opacity: 0, y: -20, duration: 0.4, ease: 'power2.in' });
@@ -150,14 +173,18 @@ export default function CreateAnnonce() {
           </div>
 
           <div className="form-group">
-            <label>Lien d'image (URL)</label>
+            <label>Image du produit (PC)</label>
             <input 
-              type="url" 
-              value={imageUrl} 
-              onChange={(e) => setImageUrl(e.target.value)} 
-              placeholder="https://exemple.com/image.jpg"
+              type="file" 
+              accept="image/*"
+              onChange={handleImageChange} 
             />
-            <small className="help-text">Pour le moment, collez une URL d'image publique.</small>
+            {imagePreview && (
+              <div style={{ marginTop: '10px' }}>
+                <img src={imagePreview} alt="Aperçu" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' }} />
+              </div>
+            )}
+            <small className="help-text">Sélectionnez une image depuis votre ordinateur.</small>
           </div>
 
           <div className="form-group">
