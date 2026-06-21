@@ -1,29 +1,57 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import gsap from 'gsap';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 export default function AnnonceDetails() {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
   const [annonce, setAnnonce] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // States for features
+  const [isFavori, setIsFavori] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [avgRating, setAvgRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  
+  const [offrePrix, setOffrePrix] = useState('');
+  const [showOffreModal, setShowOffreModal] = useState(false);
+  const [actionMsg, setActionMsg] = useState('');
+
   const containerRef = useRef(null);
   const contentRef = useRef(null);
 
-  useEffect(() => {
-    const fetchAnnonce = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/api/annonces/${id}`);
-        setAnnonce(res.data);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Annonce introuvable');
-      } finally {
-        setLoading(false);
+  const fetchAnnonceAndData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const res = await axios.get(`http://localhost:5000/api/annonces/${id}`);
+      setAnnonce(res.data);
+
+      if (res.data.User?.id) {
+        const revRes = await axios.get(`http://localhost:5000/api/reviews/vendeur/${res.data.User.id}`);
+        setReviews(revRes.data.reviews);
+        setAvgRating(revRes.data.avgRating);
       }
-    };
-    fetchAnnonce();
+
+      if (token) {
+        const favRes = await axios.get('http://localhost:5000/api/favoris', { headers });
+        setIsFavori(favRes.data.some(f => f.annonceId === parseInt(id)));
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Annonce introuvable');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnonceAndData();
   }, [id]);
 
   useEffect(() => {
@@ -37,6 +65,51 @@ export default function AnnonceDetails() {
       return () => ctx.revert();
     }
   }, [loading, annonce]);
+
+  const toggleFavori = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return alert('Veuillez vous connecter');
+      if (isFavori) {
+        await axios.delete(`http://localhost:5000/api/favoris/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        setIsFavori(false);
+      } else {
+        await axios.post('http://localhost:5000/api/favoris', { annonceId: id }, { headers: { Authorization: `Bearer ${token}` } });
+        setIsFavori(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleMakeOffre = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/offres', {
+        annonceId: id, prixPropose: parseFloat(offrePrix)
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setShowOffreModal(false);
+      setActionMsg('Offre envoyée avec succès !');
+      setTimeout(() => setActionMsg(''), 3000);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
+  const handlePostReview = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/reviews', {
+        vendeurId: annonce.userId, rating: reviewRating, comment: reviewText
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setReviewText('');
+      fetchAnnonceAndData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
 
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -64,120 +137,197 @@ export default function AnnonceDetails() {
     );
   }
 
+  const waLink = annonce.User?.telephone 
+    ? `https://wa.me/${annonce.User.telephone.replace(/[^0-9]/g, '')}?text=Bonjour, je suis intéressé par votre annonce "${annonce.titre}" sur Marketplace PFE.` 
+    : '#';
+
   return (
     <div ref={containerRef} className="details-page">
       <div className="grid-bg" />
       
       <div className="details-nav">
         <Link to="/" className="back-link">← Retour au catalogue</Link>
+        {actionMsg && <div className="action-msg">{actionMsg}</div>}
       </div>
 
       <div ref={contentRef} className="details-content">
-        <div className="details-image-section">
-          {annonce.images && annonce.images.length > 0 ? (
-            <img src={annonce.images[0]} alt={annonce.titre} className="main-image" />
-          ) : (
-            <div className="no-image-large">
-              <span className="no-image-icon">📷</span>
-              <p>Pas d'image disponible</p>
-            </div>
-          )}
-        </div>
-
-        <div className="details-info-section">
-          <div className="info-header">
-            <span className="badge-category">{annonce.categorie}</span>
-            <span className="badge-etat">{annonce.etat}</span>
-          </div>
-
-          <h1 className="details-title">{annonce.titre}</h1>
-          <div className="details-price">{annonce.prix.toFixed(2)} DH</div>
-
-          <div className="details-seller-card">
-            <div className="seller-avatar">{getInitials(annonce.User?.nom)}</div>
-            <div className="seller-info">
-              <h4>{annonce.User?.nom}</h4>
-              <p>Vendeur vérifié</p>
-            </div>
-            {/* Placeholder pour l'Étudiant 4 (Négociation & WhatsApp) */}
-            <button className="contact-btn" disabled title="Bientôt disponible (Étudiant 4)">
-              <span>💬</span> Contacter
+        <div className="left-column">
+          <div className="details-image-section">
+            <button className={`fav-btn ${isFavori ? 'active' : ''}`} onClick={toggleFavori}>
+              {isFavori ? '❤️' : '🤍'}
             </button>
+            {annonce.images && annonce.images.length > 0 ? (
+              <img src={annonce.images[0]} alt={annonce.titre} className="main-image" />
+            ) : (
+              <div className="no-image-large">
+                <span className="no-image-icon">📷</span>
+                <p>Pas d'image disponible</p>
+              </div>
+            )}
           </div>
 
           <div className="details-description">
             <h3>Description du produit</h3>
             <p>{annonce.description}</p>
           </div>
-
+          
           <div className="details-meta">
             <p>Publié le : {new Date(annonce.createdAt).toLocaleDateString('fr-FR')}</p>
             <p>Référence : #{annonce.id}</p>
           </div>
         </div>
+
+        <div className="right-column">
+          <div className="info-header">
+            <span className="badge-category">{annonce.categorie}</span>
+            <span className={`badge-etat ${annonce.statut?.toLowerCase() || 'disponible'}`}>{annonce.statut || annonce.etat}</span>
+          </div>
+
+          <h1 className="details-title">{annonce.titre}</h1>
+          <div className="details-price">{annonce.prix.toFixed(2)} DH</div>
+
+          <div className="action-buttons">
+            {annonce.statut !== 'Vendu' && user && user.id !== annonce.userId && (
+              <>
+                <a href={waLink} target="_blank" rel="noreferrer" className="contact-btn">
+                  <span>💬</span> WhatsApp
+                </a>
+                <button onClick={() => setShowOffreModal(true)} className="offer-btn">
+                  <span>💰</span> Faire une offre
+                </button>
+              </>
+            )}
+            {!user && <p className="text-small">Connectez-vous pour contacter le vendeur.</p>}
+          </div>
+
+          <div className="details-seller-card">
+            <div className="seller-avatar">
+              {annonce.User?.photo ? <img src={annonce.User.photo} alt="" style={{width:'100%', borderRadius:'50%'}}/> : getInitials(annonce.User?.nom)}
+            </div>
+            <div className="seller-info">
+              <h4>{annonce.User?.nom}</h4>
+              <p>Vendeur vérifié • ⭐ {avgRating} ({reviews.length} avis)</p>
+            </div>
+          </div>
+
+          <div className="reviews-section">
+            <h3>Avis sur le vendeur</h3>
+            <div className="reviews-list">
+              {reviews.slice(0, 3).map(r => (
+                <div key={r.id} className="review-item">
+                  <strong>{r.reviewer?.nom}</strong>
+                  <span className="stars">{'⭐'.repeat(r.rating)}</span>
+                  <p>{r.comment}</p>
+                </div>
+              ))}
+              {reviews.length === 0 && <p className="text-small">Aucun avis pour le moment.</p>}
+            </div>
+
+            {user && user.id !== annonce.userId && (
+              <form onSubmit={handlePostReview} className="review-form">
+                <h4>Laisser un avis</h4>
+                <select value={reviewRating} onChange={e => setReviewRating(Number(e.target.value))}>
+                  {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Étoiles</option>)}
+                </select>
+                <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Votre commentaire..." required rows="2" />
+                <button type="submit">Publier</button>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
+
+      {showOffreModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card">
+            <h2>Proposer un prix</h2>
+            <p>Prix actuel : <strong>{annonce.prix} DH</strong></p>
+            <form onSubmit={handleMakeOffre}>
+              <input type="number" value={offrePrix} onChange={e => setOffrePrix(e.target.value)} placeholder="Votre offre (DH)" required min="1" />
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowOffreModal(false)} className="btn-cancel">Annuler</button>
+                <button type="submit" className="btn-submit">Envoyer l'offre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
-        .details-page {
-          min-height: 100vh; background: #050816; font-family: 'Inter', sans-serif;
-          color: #f1f5f9; padding: 40px 20px; position: relative;
-        }
-        .grid-bg {
-          position: fixed; inset: 0; background-image: radial-gradient(rgba(20,184,166,0.08) 1px, transparent 1px);
-          background-size: 40px 40px; pointer-events: none; z-index: 0;
-        }
+        .details-page { min-height: 100vh; background: #050816; font-family: 'Inter', sans-serif; color: #f1f5f9; padding: 40px 20px; position: relative; }
+        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(rgba(20,184,166,0.08) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
         .loading-center, .error-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { font-size: 24px; display: inline-block; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .details-nav { max-width: 1000px; margin: 0 auto 30px; position: relative; z-index: 10; }
+        .details-nav { max-width: 1100px; margin: 0 auto 30px; position: relative; z-index: 10; display: flex; justify-content: space-between; }
         .back-link { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
         .back-link:hover { color: #f1f5f9; }
+        .action-msg { background: rgba(34,197,94,0.2); color: #4ade80; padding: 6px 12px; border-radius: 8px; font-size: 13px; }
 
-        .details-content {
-          max-width: 1000px; margin: 0 auto; position: relative; z-index: 10;
-          display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
-          background: rgba(255,255,255,0.02); backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 32px;
-        }
+        .details-content { max-width: 1100px; margin: 0 auto; position: relative; z-index: 10; display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
+        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 32px; }
 
-        .details-image-section { border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.3); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+        .details-image-section { border-radius: 24px; overflow: hidden; background: rgba(0,0,0,0.3); aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); }
         .main-image { width: 100%; height: 100%; object-fit: cover; }
         .no-image-large { text-align: center; color: #475569; }
         .no-image-large .no-image-icon { font-size: 64px; opacity: 0.3; display: block; margin-bottom: 10px; }
+        
+        .fav-btn { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); border: none; font-size: 24px; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); transition: 0.2s; }
+        .fav-btn:hover { transform: scale(1.1); }
+        .fav-btn.active { background: rgba(239,68,68,0.2); }
 
         .info-header { display: flex; gap: 10px; margin-bottom: 16px; }
         .badge-category { background: rgba(249,115,22,0.15); color: #fdba74; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .badge-etat { background: rgba(20,184,166,0.15); color: #5eead4; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; }
+        .badge-etat.vendu { background: rgba(239,68,68,0.2); color: #f87171; text-decoration: line-through; }
 
         .details-title { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
-        .details-price { font-size: 28px; font-weight: 900; color: #2dd4bf; margin-bottom: 32px; }
+        .details-price { font-size: 36px; font-weight: 900; color: #2dd4bf; margin-bottom: 32px; }
 
-        .details-seller-card {
-          display: flex; align-items: center; gap: 16px;
-          background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-          padding: 16px; border-radius: 16px; margin-bottom: 32px;
-        }
-        .seller-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #14b8a6); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
-        .seller-info { flex: 1; }
-        .seller-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-        .seller-info p { font-size: 12px; color: #94a3b8; }
-        .contact-btn {
-          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;
-          padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: not-allowed;
-          display: flex; align-items: center; gap: 8px;
-        }
+        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
+        .contact-btn { flex: 1; background: linear-gradient(135deg, #25D366, #128C7E); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px; box-shadow: 0 10px 25px rgba(37,211,102,0.3); transition: 0.2s; }
+        .contact-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(37,211,102,0.4); }
+        .offer-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .offer-btn:hover { background: rgba(255,255,255,0.1); }
+        .text-small { font-size: 13px; color: #64748b; }
 
-        .details-description h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; margin-bottom: 16px; }
-        .details-description p { font-size: 15px; color: #cbd5e1; line-height: 1.6; white-space: pre-wrap; margin-bottom: 32px; }
+        .details-seller-card { display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 20px; border-radius: 20px; margin-bottom: 30px; }
+        .seller-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #14b8a6); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; overflow: hidden; }
+        .seller-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .seller-info p { font-size: 13px; color: #94a3b8; margin: 0; }
 
-        .details-meta { font-size: 12px; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px; }
+        .reviews-section { background: rgba(0,0,0,0.2); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .reviews-section h3 { font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .reviews-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        .review-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; }
+        .review-item strong { display: block; font-size: 14px; margin-bottom: 5px; }
+        .stars { font-size: 12px; margin-bottom: 8px; display: block; }
+        .review-item p { font-size: 14px; color: #cbd5e1; margin: 0; }
+        
+        .review-form { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .review-form h4 { font-size: 14px; margin-bottom: 15px; }
+        .review-form select, .review-form textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
+        .review-form button { background: #f97316; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        @media (max-width: 800px) {
-          .details-content { grid-template-columns: 1fr; gap: 24px; padding: 20px; }
-          .details-title { font-size: 24px; }
+        .details-description h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
+        .details-description p { font-size: 16px; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; margin-bottom: 32px; }
+        .details-meta { font-size: 13px; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .modal-content { width: 100%; max-width: 400px; padding: 40px; text-align: center; }
+        .modal-content h2 { margin-bottom: 10px; }
+        .modal-content p { color: #94a3b8; margin-bottom: 20px; }
+        .modal-content input { width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(20,184,166,0.3); border-radius: 12px; color: #fff; font-size: 18px; text-align: center; margin-bottom: 20px; outline: none; }
+        .modal-content input:focus { border-color: #14b8a6; }
+        .modal-actions { display: flex; gap: 10px; }
+        .btn-cancel { flex: 1; padding: 12px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 10px; cursor: pointer; }
+        .btn-submit { flex: 1; padding: 12px; background: #14b8a6; border: none; color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+        @media (max-width: 900px) {
+          .details-content { grid-template-columns: 1fr; gap: 24px; }
         }
       `}</style>
     </div>

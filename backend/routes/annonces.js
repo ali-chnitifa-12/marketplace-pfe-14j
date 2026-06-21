@@ -55,7 +55,7 @@ router.get('/:id', async (req, res) => {
     const annonce = await Annonce.findByPk(req.params.id, {
       include: [{
         model: User,
-        attributes: ['id', 'nom', 'photo', 'email']
+        attributes: ['id', 'nom', 'photo', 'email', 'telephone']
       }]
     });
     
@@ -114,7 +114,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Vous n\'êtes pas autorisé à modifier cette annonce.' });
     }
 
-    const { titre, description, prix, etat, categorie, images } = req.body;
+    const { titre, description, prix, etat, categorie, images, statut } = req.body;
     
     await annonce.update({
       titre: titre || annonce.titre,
@@ -122,7 +122,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
       prix: prix || annonce.prix,
       etat: etat || annonce.etat,
       categorie: categorie || annonce.categorie,
-      images: images || annonce.images
+      images: images || annonce.images,
+      statut: statut || annonce.statut
     });
 
     res.json(annonce);

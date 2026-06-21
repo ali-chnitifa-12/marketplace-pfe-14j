@@ -9,6 +9,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import CreateAnnonce from './pages/CreateAnnonce';
 import AnnonceDetails from './pages/AnnonceDetails';
+import Profile from './pages/Profile';
 
 
 const PrivateRoute = ({ children }) => {
@@ -80,6 +81,11 @@ function App() {
           <Route path="/annonce/:id" element={
             <PrivateRoute>
               <AnnonceDetails />
+            </PrivateRoute>
+          } />
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <Profile />
             </PrivateRoute>
           } />
           <Route path="/" element={

@@ -1,194 +1,202 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 
 export default function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const containerRef = useRef(null);
-  const cardRef = useRef(null);
-  const orb1Ref = useRef(null);
-  const orb2Ref = useRef(null);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.to(orb1Ref.current, { x: 40, y: -30, duration: 5, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-      gsap.to(orb2Ref.current, { x: -50, y: 40, duration: 6, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1 });
+  const [stats, setStats] = useState({ totalUsers: 0, totalAdmins: 0, totalBanned: 0, totalActive: 0 });
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-      gsap.fromTo(cardRef.current,
-        { scale: 0.85, opacity: 0, y: 30 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: 'back.out(1.5)' }
-      );
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
+  const fetchAdminData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
 
-  const handleLogout = () => {
-    gsap.to(cardRef.current, { scale: 0.95, opacity: 0, duration: 0.4, ease: 'power2.in' });
-    setTimeout(() => {
-      logout();
-      navigate('/login');
-    }, 400);
+      const [statsRes, usersRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/admin/stats', { headers }),
+        axios.get('http://localhost:5000/api/admin/users', { headers })
+      ]);
+
+      setStats(statsRes.data);
+      setUsers(usersRes.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
+
+  const handleBan = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/admin/users/${id}/ban`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchAdminData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
+  const handleRole = async (id, currentRole) => {
+    try {
+      const token = localStorage.getItem('token');
+      const newRole = currentRole === 'admin' ? 'user' : 'admin';
+      await axios.put(`http://localhost:5000/api/admin/users/${id}/role`, { role: newRole }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchAdminData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Supprimer cet utilisateur définitivement ?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchAdminData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur');
+    }
+  };
+
+  if (loading) return <div className="admin-page"><div className="grid-bg"/><h2>Chargement du Dashboard...</h2></div>;
+
   return (
-    <div ref={containerRef} className="admin-placeholder-page">
-      <div ref={orb1Ref} className="orb orb-1" />
-      <div ref={orb2Ref} className="orb orb-2" />
+    <div className="admin-page">
       <div className="grid-bg" />
-
-      <div ref={cardRef} className="admin-placeholder-card">
-        <div className="admin-logo-area">
-          <span className="admin-logo-icon">🛡️</span>
-          <span className="admin-logo-text">Admin Panel</span>
-        </div>
-
-        <div className="admin-avatar">
-          {user?.nom ? user.nom.charAt(0).toUpperCase() : 'A'}
-        </div>
-
-        <h1 className="admin-title">
-          Bienvenue, <span className="admin-name">{user?.nom || 'Admin'}</span>
-        </h1>
-        <p className="admin-role-badge">👑 Administrateur</p>
-
-        <div className="admin-notice">
-          <span className="notice-icon">🚧</span>
+      <div className="admin-container">
+        
+        <div className="admin-header">
           <div>
-            <h3>Dashboard en cours de développement</h3>
-            <p>L'Étudiant 7 prendra le relais pour implémenter le Dashboard Admin complet avec la gestion des utilisateurs, la modération des annonces et les statistiques.</p>
+            <h1>Dashboard Administrateur</h1>
+            <p>Connecté en tant que {user?.nom}</p>
+          </div>
+          <button onClick={logout} className="btn-logout">Déconnexion</button>
+        </div>
+
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Utilisateurs</h3>
+            <p className="stat-value">{stats.totalUsers}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Admins Actifs</h3>
+            <p className="stat-value text-purple">{stats.totalAdmins}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Comptes Actifs</h3>
+            <p className="stat-value text-green">{stats.totalActive}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Comptes Bannis</h3>
+            <p className="stat-value text-red">{stats.totalBanned}</p>
           </div>
         </div>
 
-        <div className="admin-api-info">
-          <h4>✅ API Backend prête</h4>
-          <div className="api-list">
-            <div className="api-item"><span className="api-method get">GET</span> <code>/api/admin/users</code></div>
-            <div className="api-item"><span className="api-method get">GET</span> <code>/api/admin/stats</code></div>
-            <div className="api-item"><span className="api-method put">PUT</span> <code>/api/admin/users/:id/role</code></div>
-            <div className="api-item"><span className="api-method put">PUT</span> <code>/api/admin/users/:id/ban</code></div>
-            <div className="api-item"><span className="api-method del">DEL</span> <code>/api/admin/users/:id</code></div>
+        <div className="users-section glass-card">
+          <h2>Gestion des Utilisateurs</h2>
+          <div className="table-responsive">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Rôle</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id}>
+                    <td>#{u.id}</td>
+                    <td>{u.nom}</td>
+                    <td>{u.email}</td>
+                    <td><span className={`badge ${u.role}`}>{u.role}</span></td>
+                    <td>
+                      {u.isBanned 
+                        ? <span className="badge banned">Banni</span> 
+                        : <span className="badge active">Actif</span>}
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        {u.id !== user?.id && (
+                          <>
+                            <button onClick={() => handleRole(u.id, u.role)} className="btn-role">
+                              {u.role === 'admin' ? 'Rétrograder' : 'Promouvoir'}
+                            </button>
+                            <button onClick={() => handleBan(u.id)} className={`btn-ban ${u.isBanned ? 'unban' : ''}`}>
+                              {u.isBanned ? 'Débannir' : 'Bannir'}
+                            </button>
+                            <button onClick={() => handleDelete(u.id)} className="btn-delete">Supprimer</button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-
-        <button onClick={handleLogout} className="admin-logout-btn">
-          ⏻ Déconnexion
-        </button>
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        .admin-page { min-height: 100vh; background: #050816; color: #f1f5f9; padding: 40px 20px; font-family: 'Inter', sans-serif; }
+        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(rgba(167,139,250,0.1) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+        .admin-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; }
+        
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .admin-header h1 { font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .btn-logout { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
 
-        .admin-placeholder-page {
-          min-height: 100vh;
-          background: #050816;
-          display: flex; align-items: center; justify-content: center;
-          font-family: 'Inter', sans-serif;
-          overflow: hidden; position: relative; padding: 20px;
-        }
-        .grid-bg {
-          position: fixed; inset: 0;
-          background-image: radial-gradient(rgba(167,139,250,0.1) 1px, transparent 1px);
-          background-size: 30px 30px; pointer-events: none;
-        }
-        .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
-        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%); top: -120px; left: -80px; }
-        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%); bottom: -100px; right: -60px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 24px; border-radius: 20px; text-align: center; }
+        .stat-card h3 { font-size: 14px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-value { font-size: 48px; font-weight: 900; margin: 0; }
+        .text-purple { color: #a78bfa; }
+        .text-green { color: #34d399; }
+        .text-red { color: #f87171; }
 
-        .admin-placeholder-card {
-          position: relative; z-index: 10;
-          background: rgba(255,255,255,0.03);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 28px;
-          padding: 48px;
-          width: 100%; max-width: 520px;
-          box-shadow: 0 0 0 1px rgba(167,139,250,0.12), 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
-          text-align: center;
-        }
+        .glass-card { background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 30px; }
+        .users-section h2 { margin-bottom: 20px; font-size: 20px; }
 
-        .admin-logo-area { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
-        .admin-logo-icon { font-size: 26px; }
-        .admin-logo-text { font-size: 16px; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .table-responsive { overflow-x: auto; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th, .admin-table td { padding: 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .admin-table th { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .admin-table td { font-size: 14px; }
 
-        .admin-avatar {
-          width: 80px; height: 80px; margin: 0 auto 20px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #a78bfa, #7c3aed);
-          color: white; font-size: 32px; font-weight: 900;
-          display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 0 30px rgba(167,139,250,0.4);
-          border: 3px solid rgba(255,255,255,0.1);
-        }
+        .badge { padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge.admin { background: rgba(167,139,250,0.2); color: #c4b5fd; }
+        .badge.user { background: rgba(255,255,255,0.1); color: #cbd5e1; }
+        .badge.active { background: rgba(52,211,153,0.2); color: #6ee7b7; }
+        .badge.banned { background: rgba(239,68,68,0.2); color: #fca5a5; }
 
-        .admin-title { font-size: 26px; font-weight: 800; color: #f1f5f9; margin-bottom: 8px; }
-        .admin-name { color: #c4b5fd; }
-        .admin-role-badge {
-          display: inline-block;
-          background: rgba(167,139,250,0.12);
-          border: 1px solid rgba(167,139,250,0.25);
-          color: #c4b5fd; font-size: 13px; font-weight: 600;
-          padding: 5px 16px; border-radius: 100px;
-          margin-bottom: 28px;
-        }
-
-        .admin-notice {
-          display: flex; align-items: flex-start; gap: 14px;
-          background: rgba(234,179,8,0.06);
-          border: 1px solid rgba(234,179,8,0.15);
-          border-radius: 16px;
-          padding: 18px 20px;
-          text-align: left;
-          margin-bottom: 24px;
-        }
-        .notice-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-        .admin-notice h3 { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 6px; }
-        .admin-notice p { font-size: 12px; color: #64748b; line-height: 1.6; }
-
-        .admin-api-info {
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 16px;
-          padding: 18px 20px;
-          text-align: left;
-          margin-bottom: 28px;
-        }
-        .admin-api-info h4 { font-size: 13px; font-weight: 700; color: #34d399; margin-bottom: 14px; }
-        .api-list { display: flex; flex-direction: column; gap: 8px; }
-        .api-item {
-          display: flex; align-items: center; gap: 10px;
-          font-size: 12px; color: #94a3b8;
-        }
-        .api-item code {
-          font-family: 'JetBrains Mono', 'Fira Code', monospace;
-          background: rgba(255,255,255,0.04);
-          padding: 3px 8px; border-radius: 6px;
-          font-size: 11px; color: #cbd5e1;
-        }
-        .api-method {
-          font-size: 10px; font-weight: 800;
-          padding: 2px 8px; border-radius: 4px;
-          text-transform: uppercase; min-width: 36px; text-align: center;
-        }
-        .api-method.get { background: rgba(20,184,166,0.15); color: #14b8a6; }
-        .api-method.put { background: rgba(249,115,22,0.15); color: #f97316; }
-        .api-method.del { background: rgba(239,68,68,0.15); color: #ef4444; }
-
-        .admin-logout-btn {
-          width: 100%; padding: 14px;
-          background: rgba(239,68,68,0.1);
-          border: 1px solid rgba(239,68,68,0.2);
-          border-radius: 14px; cursor: pointer;
-          color: #fca5a5; font-size: 14px; font-weight: 700;
-          font-family: 'Inter', sans-serif;
-          transition: all 0.3s;
-        }
-        .admin-logout-btn:hover {
-          background: rgba(239,68,68,0.2);
-          border-color: rgba(239,68,68,0.4);
-        }
+        .action-buttons { display: flex; gap: 8px; }
+        .action-buttons button { border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-role { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+        .btn-ban { background: rgba(245,158,11,0.15); color: #fcd34d; }
+        .btn-ban.unban { background: rgba(52,211,153,0.15); color: #6ee7b7; }
+        .btn-delete { background: rgba(239,68,68,0.15); color: #fca5a5; }
+        .action-buttons button:hover { filter: brightness(1.2); }
       `}</style>
     </div>
   );
