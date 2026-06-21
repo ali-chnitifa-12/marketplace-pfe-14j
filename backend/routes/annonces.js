@@ -70,8 +70,10 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+const upload = require('../middlewares/upload');
+
 // ─── POST: Créer une annonce (Protégé) ─────────────────────────────────────
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     // Vérifier si l'utilisateur est bien un vendeur (optionnel si un admin peut aussi vendre)
     if (req.user.role !== 'admin') {
@@ -81,17 +83,27 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     }
 
-    const { titre, description, prix, etat, categorie, images, latitude, longitude } = req.body;
+    const { titre, description, prix, etat, categorie, latitude, longitude } = req.body;
+    let images = [];
+
+    // Si on reçoit un fichier uploadé
+    if (req.file) {
+      images.push(`http://localhost:5000/uploads/${req.file.filename}`);
+    } 
+    // Sinon si l'utilisateur passe une URL (rétrocompatibilité pour le seeding)
+    else if (req.body.images) {
+      images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+    }
 
     const nouvelleAnnonce = await Annonce.create({
       titre,
       description,
-      prix,
+      prix: parseFloat(prix),
       etat,
       categorie,
-      images: images || [],
-      latitude,
-      longitude,
+      images,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
       userId: req.user.id
     });
 
