@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review');
 const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
+const protect = require('../middlewares/authMiddleware');
 
 // Get all reviews for a specific vendeur
 router.get('/vendeur/:id', async (req, res) => {

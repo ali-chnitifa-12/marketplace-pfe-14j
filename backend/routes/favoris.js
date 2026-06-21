@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Favori = require('../models/Favori');
 const Annonce = require('../models/Annonce');
-const { protect } = require('../middleware/authMiddleware');
+const protect = require('../middlewares/authMiddleware');
 
-// Get all favoris for the logged-in user
+// Get user's favorites for the logged-in user
 router.get('/', protect, async (req, res) => {
   try {
     const favoris = await Favori.findAll({

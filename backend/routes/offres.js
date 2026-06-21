@@ -3,7 +3,7 @@ const router = express.Router();
 const Offre = require('../models/Offre');
 const Annonce = require('../models/Annonce');
 const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
+const protect = require('../middlewares/authMiddleware');
 
 // Get all offers for a specific user's ads (Seller dashboard)
 router.get('/recues', protect, async (req, res) => {
