@@ -128,9 +128,9 @@ export default function Home() {
               <span>➕</span> Publier
             </Link>
           )}
-          <div className="nav-user-pill">
+          <Link to="/profile" className="nav-user-pill" style={{ textDecoration: 'none' }}>
             <div className="nav-user-avatar">{getInitials(user?.nom)}</div>
-          </div>
+          </Link>
           <button onClick={handleLogout} className="nav-logout-btn">
             <span>⏻</span>
           </button>
