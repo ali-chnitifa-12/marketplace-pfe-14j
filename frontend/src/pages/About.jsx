@@ -12,22 +12,8 @@ export default function About() {
   const containerRef = useRef(null);
   const navRef = useRef(null);
   const heroRef = useRef(null);
-  const featuresRef = useRef(null);
-  const techRef = useRef(null);
   const orb1Ref = useRef(null);
   const orb2Ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.to(orb1Ref.current, { x: 50, y: -30, duration: 6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-      gsap.to(orb2Ref.current, { x: -40, y: 40, duration: 7, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1 });
-      gsap.fromTo(navRef.current, { y: -60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' });
-      gsap.fromTo(heroRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 1, delay: 0.2, ease: 'power3.out' });
-      gsap.fromTo('.feature-card', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, delay: 0.5, stagger: 0.08, ease: 'power3.out' });
-      gsap.fromTo(techRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, delay: 1.2, ease: 'power3.out' });
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
 
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -35,30 +21,40 @@ export default function About() {
     return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.charAt(0).toUpperCase();
   };
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(orb1Ref.current, { x: 70, y: -50, scale: 1.1, duration: 8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      gsap.to(orb2Ref.current, { x: -60, y: 60, scale: 0.9, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1 });
+      gsap.fromTo(navRef.current, { y: -70, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'elastic.out(1, 0.5)' });
+      gsap.fromTo(heroRef.current, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1, delay: 0.3, ease: 'power3.out' });
+      gsap.fromTo('.feature-card', { y: 40, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, delay: 0.6, stagger: 0.07, ease: 'back.out(1.5)' });
+      gsap.fromTo('.tech-pill', { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, delay: 1.0, stagger: 0.04, ease: 'power2.out' });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
 
   const features = [
-    { icon: '🛍️', title: 'Marketplace Complète', desc: 'Publiez, recherchez et achetez des produits en toute simplicité. Filtrage avancé par catégorie, prix et état.' },
-    { icon: '💳', title: 'Paiement à la Livraison', desc: 'Commandez en Cash on Delivery et suivez le statut de votre commande en temps réel depuis votre profil.' },
-    { icon: '📍', title: 'Géolocalisation & Points Relais', desc: 'Localisez chaque annonce sur une carte interactive et choisissez un point de retrait relais près de chez vous.' },
-    { icon: '💬', title: 'Négociation via WhatsApp', desc: 'Contactez directement le vendeur via un bouton WhatsApp intégré pour négocier le prix.' },
-    { icon: '⭐', title: 'Avis & Réputation', desc: 'Évaluez les vendeurs avec des étoiles et des commentaires. La note moyenne reflète la fiabilité du vendeur.' },
-    { icon: '🔨', title: 'Enchères en Temps Réel', desc: 'Participez à des ventes aux enchères dynamiques. Surenchérissez et suivez les offres en direct.' },
-    { icon: '🤖', title: 'Assistant IA Intelligent', desc: 'Posez vos questions à notre chatbot IA alimenté par OpenAI. Il vous guide et répond en Darija ou en Français.' },
-    { icon: '🛡️', title: 'Modération Automatique', desc: "Un filtre IA anti-spam détecte automatiquement les annonces frauduleuses et les signale pour modération." },
-    { icon: '🌙', title: 'Mode Sombre & Clair', desc: 'Basculez entre un thème sombre élégant et un mode clair lumineux selon votre préférence.' },
+    { icon: '🛍️', title: 'Marketplace Complète', desc: 'Publiez, recherchez et achetez des produits en toute simplicité. Filtrage avancé par catégorie, prix et état.', color: '#f97316' },
+    { icon: '💳', title: 'Paiement à la Livraison', desc: 'Commandez en Cash on Delivery et suivez le statut en temps réel depuis votre profil.', color: '#10b981' },
+    { icon: '📍', title: 'Géolocalisation & Relais', desc: 'Localisez chaque annonce sur carte et choisissez un point de retrait près de chez vous.', color: '#14b8a6' },
+    { icon: '💬', title: 'Négociation WhatsApp', desc: 'Contactez le vendeur directement via un bouton WhatsApp intégré pour négocier.', color: '#25d366' },
+    { icon: '⭐', title: 'Avis & Réputation', desc: 'Évaluez les vendeurs. La note moyenne reflète la fiabilité du vendeur.', color: '#f59e0b' },
+    { icon: '🔨', title: 'Enchères en Temps Réel', desc: 'Participez à des ventes aux enchères dynamiques et surenchérissez en direct.', color: '#8b5cf6' },
+    { icon: '🤖', title: 'Assistant IA', desc: 'Chatbot alimenté par OpenAI. Il vous guide en Darija ou en Français.', color: '#06b6d4' },
+    { icon: '🛡️', title: 'Modération Automatique', desc: 'Filtre IA anti-spam qui détecte les annonces frauduleuses automatiquement.', color: '#ec4899' },
+    { icon: '🌙', title: 'Mode Sombre & Clair', desc: 'Basculez entre thème sombre élégant et mode clair lumineux.', color: '#a78bfa' },
   ];
 
   const techStack = [
-    { name: 'React.js', desc: 'Interface utilisateur dynamique', color: '#61dafb' },
-    { name: 'Node.js', desc: 'Serveur backend performant', color: '#68a063' },
-    { name: 'Express.js', desc: 'Framework API RESTful', color: '#f97316' },
-    { name: 'Sequelize', desc: 'ORM pour base de données', color: '#3178c6' },
-    { name: 'Chart.js', desc: 'Visualisations statistiques', color: '#ff6384' },
-    { name: 'GSAP', desc: 'Animations fluides premium', color: '#88ce02' },
+    { name: 'React.js', desc: 'Interface dynamique', color: '#61dafb' },
+    { name: 'Node.js', desc: 'Serveur backend', color: '#68a063' },
+    { name: 'Express.js', desc: 'API RESTful', color: '#f97316' },
+    { name: 'Sequelize', desc: 'ORM MySQL', color: '#3178c6' },
+    { name: 'Chart.js', desc: 'Visualisations', color: '#ff6384' },
+    { name: 'GSAP', desc: 'Animations premium', color: '#88ce02' },
     { name: 'Leaflet', desc: 'Cartes interactives', color: '#199900' },
-    { name: 'OpenAI API', desc: 'Chatbot IA conversationnel', color: '#10a37f' },
-    { name: 'JWT & Bcrypt', desc: 'Authentification sécurisée', color: '#a78bfa' },
+    { name: 'OpenAI API', desc: 'Chatbot IA', color: '#10a37f' },
+    { name: 'JWT & Bcrypt', desc: 'Auth sécurisée', color: '#a78bfa' },
   ];
 
   return (
@@ -67,72 +63,70 @@ export default function About() {
       <div ref={orb2Ref} className="orb orb-2" />
       <div className="grid-bg" />
 
-      {/* Navigation */}
+      {/* Nav */}
       <nav ref={navRef} className="top-nav">
         <div className="nav-left">
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}>
-            <span className="nav-logo-icon">📍</span>
+          <Link to="/" style={{ display:'flex', alignItems:'center', gap:'10px', textDecoration:'none', color:'inherit' }}>
+            <div className="nav-logo-box">📍</div>
             <span className="nav-logo-text">Products Marketplace</span>
           </Link>
-          <Link to="/about" className="nav-about-link active">À Propos</Link>
+          <Link to="/about" className="nav-pill active">À Propos</Link>
         </div>
         <div className="nav-right">
-          <button onClick={toggleTheme} className="nav-theme-btn">{isLightMode ? '🌙' : '☀️'}</button>
-          <Link to="/profile" className="nav-user-pill" style={{ textDecoration: 'none' }}>
-            <div className="nav-user-avatar">{getInitials(user?.nom)}</div>
+          <button onClick={toggleTheme} className="icon-btn">{isLightMode ? '🌙' : '☀️'}</button>
+          <Link to="/profile" className="avatar-ring-link">
+            <div className="avatar-ring"><div className="avatar-inner">{getInitials(user?.nom)}</div></div>
           </Link>
-          <button onClick={handleLogout} className="nav-logout-btn"><span>⏻</span></button>
+          <button onClick={() => { logout(); navigate('/login'); }} className="icon-btn logout-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
         </div>
       </nav>
 
-      {/* Hero Section */}
       <div className="about-container">
+        {/* Hero */}
         <section ref={heroRef} className="hero-section">
-          <div className="hero-badge">🇲🇦 Made in Morocco</div>
-          <h1 className="hero-title">Products Marketplace</h1>
+          <span className="hero-badge">🇲🇦 Made in Morocco</span>
+          <h1 className="hero-title">
+            <span className="gradient-text">Products</span><br />Marketplace
+          </h1>
           <p className="hero-subtitle">
-            La plateforme e-commerce marocaine nouvelle génération qui réunit acheteurs et vendeurs 
-            dans un écosystème moderne, sécurisé et intelligent.
+            La plateforme e-commerce marocaine nouvelle génération qui réunit acheteurs et vendeurs dans un écosystème moderne, sécurisé et intelligent.
           </p>
           <div className="hero-stats">
-            <div className="stat-pill">
-              <span className="stat-number">9+</span>
-              <span className="stat-label">Fonctionnalités</span>
-            </div>
-            <div className="stat-pill">
-              <span className="stat-number">9</span>
-              <span className="stat-label">Technologies</span>
-            </div>
-            <div className="stat-pill">
-              <span className="stat-number">2</span>
-              <span className="stat-label">Thèmes (Dark/Light)</span>
-            </div>
+            {[['9+','Fonctionnalités'],['9','Technologies'],[' 2','Thèmes']].map(([n,l]) => (
+              <div key={l} className="stat-pill">
+                <span className="stat-num">{n}</span>
+                <span className="stat-label">{l}</span>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* Features Grid */}
+        {/* Features */}
         <section className="features-section">
           <h2 className="section-title">Ce que propose notre plateforme</h2>
-          <p className="section-subtitle">Chaque fonctionnalité a été pensée pour offrir la meilleure expérience possible.</p>
-          <div ref={featuresRef} className="features-grid">
+          <p className="section-sub">Chaque fonctionnalité a été pensée pour offrir la meilleure expérience possible.</p>
+          <div className="features-grid">
             {features.map((f, i) => (
-              <div key={i} className="feature-card">
-                <div className="feature-icon">{f.icon}</div>
+              <div key={i} className="feature-card" style={{ '--card-accent': f.color }}>
+                <div className="feat-icon" style={{ background: `${f.color}18`, color: f.color }}>{f.icon}</div>
                 <h3>{f.title}</h3>
                 <p>{f.desc}</p>
+                <div className="feat-glow" style={{ background: f.color }} />
               </div>
             ))}
           </div>
         </section>
 
         {/* Tech Stack */}
-        <section ref={techRef} className="tech-section glass-card">
+        <section className="tech-section">
           <h2 className="section-title">Technologies Utilisées</h2>
-          <p className="section-subtitle">Un stack moderne et performant pour une application de qualité professionnelle.</p>
+          <p className="section-sub">Un stack moderne pour une application de qualité professionnelle.</p>
           <div className="tech-grid">
             {techStack.map((t, i) => (
               <div key={i} className="tech-pill">
-                <div className="tech-dot" style={{ background: t.color }} />
+                <div className="tech-dot" style={{ background: t.color, boxShadow: `0 0 8px ${t.color}` }} />
                 <div>
                   <span className="tech-name">{t.name}</span>
                   <span className="tech-desc">{t.desc}</span>
@@ -146,75 +140,83 @@ export default function About() {
         <section className="cta-section">
           <h2>Prêt à découvrir ?</h2>
           <p>Explorez les annonces, négociez les prix, et profitez d'une expérience d'achat unique.</p>
-          <Link to="/" className="cta-btn">Explorer les annonces →</Link>
+          <Link to="/" className="cta-btn">
+            Explorer les annonces <span className="cta-arrow">→</span>
+          </Link>
         </section>
       </div>
 
       <style>{`
-        .about-page { min-height: 100vh; color: var(--text-primary); padding: 100px 20px 60px; position: relative; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(var(--grid-dots) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-        
-        .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
-        .orb-1 { width: 400px; height: 400px; background: rgba(249, 115, 22, 0.08); top: 10%; left: -100px; }
-        .orb-2 { width: 350px; height: 350px; background: rgba(20, 184, 166, 0.06); bottom: 10%; right: -80px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        .about-page { min-height:100vh; color:var(--text-primary); padding:90px 20px 60px; position:relative; font-family:'Inter',sans-serif; overflow-x:hidden; }
+        .grid-bg { position:fixed; inset:0; background-image:radial-gradient(var(--grid-dots) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
+        .orb { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+        .orb-1 { width:500px; height:500px; background:radial-gradient(circle,rgba(249,115,22,0.1) 0%,transparent 70%); top:-150px; left:-130px; }
+        .orb-2 { width:450px; height:450px; background:radial-gradient(circle,rgba(20,184,166,0.08) 0%,transparent 70%); bottom:-120px; right:-100px; }
 
-        .top-nav { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: rgba(15,23,42,0.15); backdrop-filter: blur(16px); border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; }
-        .nav-left { display: flex; align-items: center; gap: 20px; }
-        .nav-logo-icon { font-size: 24px; }
-        .nav-logo-text { font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #f97316, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-about-link { text-decoration: none; color: var(--text-secondary); font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 100px; transition: 0.2s; }
-        .nav-about-link.active, .nav-about-link:hover { color: #f97316; background: rgba(249,115,22,0.1); }
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-        .nav-theme-btn, .nav-logout-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-primary); padding: 8px; border-radius: 50%; transition: 0.2s; }
-        .nav-theme-btn:hover, .nav-logout-btn:hover { background: var(--card-bg-hover); }
-        .nav-user-pill { display: flex; align-items: center; justify-content: center; }
-        .nav-user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #14b8a6); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; }
+        .top-nav { position:fixed; top:0; left:0; right:0; height:68px; background:var(--overlay-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); display:flex; align-items:center; justify-content:space-between; padding:0 36px; z-index:100; }
+        .nav-left { display:flex; align-items:center; gap:16px; }
+        .nav-logo-box { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(20,184,166,0.12)); display:flex; align-items:center; justify-content:center; font-size:17px; }
+        .nav-logo-text { font-size:15px; font-weight:800; background:linear-gradient(135deg,#f97316,#14b8a6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .nav-pill { text-decoration:none; color:var(--text-secondary); font-size:13px; font-weight:600; padding:6px 14px; border-radius:100px; transition:all 0.25s; }
+        .nav-pill.active,.nav-pill:hover { color:#f97316; background:rgba(249,115,22,0.1); }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .icon-btn { background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; width:38px; height:38px; color:var(--text-primary); font-size:17px; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; justify-content:center; }
+        .icon-btn:hover { background:var(--card-bg-hover); transform:scale(1.08); }
+        .logout-btn { color:#fca5a5; border-color:rgba(239,68,68,0.2); background:rgba(239,68,68,0.06); }
+        .logout-btn:hover { background:rgba(239,68,68,0.15); }
+        .avatar-ring-link { display:block; padding:2px; background:linear-gradient(135deg,#f97316,#14b8a6); border-radius:50%; animation:ringRotate 4s linear infinite; }
+        .avatar-ring { padding:2px; border-radius:50%; background:var(--bg-primary); }
+        .avatar-inner { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#334155,#1e293b); color:white; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
 
-        .about-container { max-width: 1000px; margin: 0 auto; position: relative; z-index: 10; }
+        .about-container { max-width:1060px; margin:0 auto; position:relative; z-index:10; }
 
         /* Hero */
-        .hero-section { text-align: center; margin-bottom: 60px; }
-        .hero-badge { display: inline-block; background: rgba(249,115,22,0.1); color: #ea580c; font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 100px; margin-bottom: 20px; border: 1px solid rgba(249,115,22,0.2); }
-        .hero-title { font-size: 52px; font-weight: 900; background: linear-gradient(135deg, #f97316, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 20px; line-height: 1.1; }
-        .hero-subtitle { font-size: 18px; color: var(--text-secondary); line-height: 1.7; max-width: 650px; margin: 0 auto 35px; }
-        .hero-stats { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .stat-pill { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px 28px; text-align: center; min-width: 130px; }
-        .stat-number { display: block; font-size: 28px; font-weight: 900; color: #f97316; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .hero-section { text-align:center; margin-bottom:80px; }
+        .hero-badge { display:inline-block; background:rgba(249,115,22,0.1); color:#ea580c; font-size:13px; font-weight:700; padding:6px 18px; border-radius:100px; margin-bottom:24px; border:1px solid rgba(249,115,22,0.2); }
+        .hero-title { font-size:72px; font-weight:900; line-height:1; letter-spacing:-0.04em; margin:0 0 20px; }
+        .hero-subtitle { font-size:18px; color:var(--text-secondary); line-height:1.7; max-width:620px; margin:0 auto 40px; }
+        .hero-stats { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; }
+        .stat-pill { background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:18px 30px; text-align:center; min-width:130px; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); cursor:default; }
+        .stat-pill:hover { transform:translateY(-6px); border-color:rgba(249,115,22,0.3); box-shadow:0 16px 40px rgba(249,115,22,0.08); }
+        .stat-num { display:block; font-size:32px; font-weight:900; color:#f97316; }
+        .stat-label { font-size:12px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
 
         /* Features */
-        .features-section { margin-bottom: 50px; }
-        .section-title { font-size: 28px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px; text-align: center; }
-        .section-subtitle { font-size: 15px; color: var(--text-secondary); text-align: center; margin: 0 0 35px; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-        .feature-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 28px; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; cursor: default; }
-        .feature-card:hover { transform: translateY(-6px); border-color: rgba(249,115,22,0.3); box-shadow: 0 12px 40px rgba(249,115,22,0.08); }
-        .feature-icon { font-size: 32px; margin-bottom: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: rgba(249,115,22,0.08); border-radius: 14px; }
-        .feature-card h3 { font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0 0 10px; }
-        .feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+        .features-section { margin-bottom:70px; }
+        .section-title { font-size:32px; font-weight:900; color:var(--text-primary); margin:0 0 10px; text-align:center; letter-spacing:-0.03em; }
+        .section-sub { font-size:15px; color:var(--text-secondary); text-align:center; margin:0 0 40px; }
+        .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:18px; }
+        .feature-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:28px; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); cursor:default; position:relative; overflow:hidden; }
+        .feature-card:hover { transform:translateY(-7px); border-color:var(--card-accent,rgba(249,115,22,0.3)); box-shadow:0 16px 50px rgba(0,0,0,0.1); }
+        .feat-icon { font-size:28px; width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:rgba(249,115,22,0.08); border-radius:16px; margin-bottom:16px; transition:transform 0.3s; }
+        .feature-card:hover .feat-icon { transform:scale(1.15) rotate(5deg); }
+        .feature-card h3 { font-size:17px; font-weight:800; color:var(--text-primary); margin:0 0 10px; }
+        .feature-card p { font-size:14px; color:var(--text-secondary); line-height:1.65; margin:0; }
+        .feat-glow { position:absolute; width:100px; height:100px; border-radius:50%; bottom:-40px; right:-30px; opacity:0.06; filter:blur(30px); pointer-events:none; }
 
         /* Tech */
-        .tech-section { margin-bottom: 50px; padding: 40px; }
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; }
-        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
-        .tech-pill { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--card-bg-hover); border: 1px solid var(--card-border); border-radius: 12px; transition: border-color 0.2s; }
-        .tech-pill:hover { border-color: var(--card-border-light); }
-        .tech-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .tech-name { display: block; font-size: 15px; font-weight: 700; color: var(--text-primary); }
-        .tech-desc { display: block; font-size: 12px; color: var(--text-secondary); }
+        .tech-section { background:var(--card-bg); border:1px solid var(--card-border); border-radius:24px; padding:40px; margin-bottom:60px; }
+        .tech-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+        .tech-pill { display:flex; align-items:center; gap:14px; padding:14px 18px; background:var(--card-bg-hover); border:1px solid var(--card-border); border-radius:14px; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); cursor:default; }
+        .tech-pill:hover { transform:translateX(6px); border-color:var(--card-border-light); }
+        .tech-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+        .tech-name { display:block; font-size:15px; font-weight:800; color:var(--text-primary); }
+        .tech-desc { display:block; font-size:12px; color:var(--text-secondary); margin-top:2px; }
 
         /* CTA */
-        .cta-section { text-align: center; padding: 50px 20px; }
-        .cta-section h2 { font-size: 28px; font-weight: 800; margin: 0 0 12px; color: var(--text-primary); }
-        .cta-section p { font-size: 15px; color: var(--text-secondary); margin: 0 0 25px; }
-        .cta-btn { display: inline-block; background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 14px 36px; border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
-        .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(249,115,22,0.3); }
+        .cta-section { text-align:center; padding:60px 20px; }
+        .cta-section h2 { font-size:36px; font-weight:900; letter-spacing:-0.03em; margin:0 0 14px; color:var(--text-primary); }
+        .cta-section p { font-size:16px; color:var(--text-secondary); margin:0 0 30px; }
+        .cta-btn { display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,#f97316,#ea580c); color:white; padding:16px 40px; border-radius:16px; font-size:16px; font-weight:800; text-decoration:none; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 8px 30px rgba(249,115,22,0.3); }
+        .cta-btn:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 16px 50px rgba(249,115,22,0.45); }
+        .cta-arrow { display:inline-block; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        .cta-btn:hover .cta-arrow { transform:translateX(5px); }
 
-        @media (max-width: 640px) {
-          .hero-title { font-size: 32px; }
-          .hero-subtitle { font-size: 16px; }
-          .hero-stats { gap: 12px; }
-          .stat-pill { min-width: 100px; padding: 12px 16px; }
+        @media (max-width:640px) {
+          .hero-title { font-size:44px; }
+          .hero-subtitle { font-size:16px; }
+          .top-nav { padding:0 16px; }
         }
       `}</style>
     </div>
