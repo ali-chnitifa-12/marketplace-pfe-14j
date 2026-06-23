@@ -2,7 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const User = require('./User');
 const Annonce = require('./Annonce');
-
+// This is the Order table (Commande)
+// It stores all orders made by users
 const Commande = sequelize.define('Commande', {
   id: {
     type: DataTypes.INTEGER,
