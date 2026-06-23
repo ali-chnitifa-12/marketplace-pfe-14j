@@ -236,7 +236,7 @@ export default function AdminDashboard() {
         <div className="users-section glass-card" style={{ marginBottom: '40px' }}>
           <h2>Modération (Annonces Signalées par l'anti-spam IA)</h2>
           {flaggedAnnonces.length === 0 ? (
-            <p style={{ color: 'var(--text-secondary)' }}>Aucune annonce signalée pour le moment.</p>
+            <p style={{ color: 'var(--text-secondary)' }}>Aucune annonce n'a été signalée jusqu'à présent.</p>
           ) : (
             <div className="table-responsive">
               <table className="admin-table">
