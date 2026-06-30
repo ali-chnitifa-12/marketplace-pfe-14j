@@ -183,21 +183,40 @@ export default function CreateAnnonce() {
           {/* Geolocation */}
           <div className="form-group">
             <label>Localisation (Optionnel)</label>
-            <button type="button" className={`geo-btn ${latitude ? 'success' : ''}`}
+
+            <button
+              type="button"
+              className={`geo-btn ${latitude ? 'success' : ''}`}
               onClick={() => {
                 if (navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
-                    (pos) => { setLatitude(pos.coords.latitude); setLongitude(pos.coords.longitude); },
+                    (pos) => {
+                      setLatitude(pos.coords.latitude);
+                      setLongitude(pos.coords.longitude);
+                    },
                     (err) => alert('Erreur : ' + err.message)
                   );
                 }
-              }}>
-              {latitude
-                ? <><span>✅</span> Localisation capturée ({latitude.toFixed(2)}, {longitude.toFixed(2)})</>
-                : <><span>📍</span> Ajouter ma localisation exacte</>
-              }
+              }}
+            >
+              {latitude ? (
+                <>
+                  <span>✅</span>
+                  Localisation capturée ({latitude.toFixed(4)}, {longitude.toFixed(4)})
+                </>
+              ) : (
+                <>
+                  <span>📍</span>
+                  Obtenir ma position actuelle
+                </>
+              )}
             </button>
-            <small className="help-text">Permet aux acheteurs de voir le produit sur une carte.</small>
+
+            <small className="help-text">
+              {latitude
+                ? '📍 Localisation ajoutée avec succès.'
+                : 'Permet aux acheteurs de voir le produit sur une carte.'}
+            </small>
           </div>
 
           {/* Progress bar inside button */}
