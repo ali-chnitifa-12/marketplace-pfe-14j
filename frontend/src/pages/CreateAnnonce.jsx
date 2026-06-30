@@ -54,7 +54,7 @@ export default function CreateAnnonce() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true); setError(''); setUploadProgress(0);
-    // Simulate progress
+    // Simulate progress.
     const progressInterval = setInterval(() => {
       setUploadProgress(p => { if (p >= 90) { clearInterval(progressInterval); return p; } return p + 10; });
     }, 100);
