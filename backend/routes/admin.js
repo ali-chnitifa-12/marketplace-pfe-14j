@@ -62,6 +62,59 @@ router.get('/stats', async (req, res) => {
       count: parseInt(c.getDataValue('count') || 0, 10)
     }));
 
+    // Taux de conversion
+    const tauxConversion = totalAnnonces > 0 ? parseFloat(((totalCommandes / totalAnnonces) * 100).toFixed(1)) : 0;
+
+    // Chiffre d'Affaire Total (Statut != Annulée)
+    const validCommandes = await Commande.findAll({
+      where: { statut: { [Op.ne]: 'Annulée' } },
+      attributes: ['prixTotal']
+    });
+    const chiffreAffaireTotal = validCommandes.reduce((acc, cmd) => acc + cmd.prixTotal, 0);
+
+    // Ventes par Statut
+    const statuts = await Commande.findAll({
+      attributes: ['statut', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+      group: ['statut']
+    });
+    const ventesParStatut = statuts.map(s => ({
+      statut: s.getDataValue('statut'),
+      count: parseInt(s.getDataValue('count') || 0, 10)
+    }));
+
+    // Top Vendeurs (Performances)
+    const allCommandesWithVendeur = await Commande.findAll({
+      where: { statut: { [Op.ne]: 'Annulée' } },
+      include: [{
+        model: Annonce,
+        attributes: ['id', 'userId'],
+        include: [{ model: User, attributes: ['id', 'nom', 'email', 'photo'] }]
+      }]
+    });
+
+    const vendeursStatsMap = {};
+    allCommandesWithVendeur.forEach(cmd => {
+      const vendeur = cmd.Annonce?.User;
+      if (vendeur) {
+        if (!vendeursStatsMap[vendeur.id]) {
+          vendeursStatsMap[vendeur.id] = { 
+            id: vendeur.id, 
+            nom: vendeur.nom, 
+            email: vendeur.email, 
+            photo: vendeur.photo, 
+            totalVentes: 0, 
+            totalRevenus: 0 
+          };
+        }
+        vendeursStatsMap[vendeur.id].totalVentes += 1;
+        vendeursStatsMap[vendeur.id].totalRevenus += cmd.prixTotal;
+      }
+    });
+
+    const topVendeurs = Object.values(vendeursStatsMap)
+      .sort((a, b) => b.totalRevenus - a.totalRevenus)
+      .slice(0, 5); // top 5
+
     res.json({
       totalUsers,
       totalAdmins,
@@ -70,7 +123,11 @@ router.get('/stats', async (req, res) => {
       totalAnnonces,
       totalFlaggedAnnonces,
       totalCommandes,
-      annoncesParCategorie
+      annoncesParCategorie,
+      tauxConversion,
+      chiffreAffaireTotal,
+      ventesParStatut,
+      topVendeurs
     });
   } catch (err) {
     console.error(err);

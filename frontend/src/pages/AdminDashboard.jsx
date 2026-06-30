@@ -58,7 +58,7 @@ export default function AdminDashboard() {
   const headerRef    = useRef(null);
   const tableRef     = useRef(null);
 
-  const [stats, setStats] = useState({ totalUsers:0, totalAdmins:0, totalBanned:0, totalActive:0, totalAnnonces:0, totalFlaggedAnnonces:0, totalCommandes:0, annoncesParCategorie:[] });
+  const [stats, setStats] = useState({ totalUsers:0, totalAdmins:0, totalBanned:0, totalActive:0, totalAnnonces:0, totalFlaggedAnnonces:0, totalCommandes:0, annoncesParCategorie:[], tauxConversion:0, chiffreAffaireTotal:0, ventesParStatut:[], topVendeurs:[] });
   const [users, setUsers] = useState([]);
   const [flaggedAnnonces, setFlaggedAnnonces] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -160,6 +160,8 @@ export default function AdminDashboard() {
           <StatCard label="Annonces"        value={stats.totalAnnonces || 0}   color="#f97316" icon="📢" delay={240} />
           <StatCard label="Commandes"       value={stats.totalCommandes || 0}  color="#14b8a6" icon="📦" delay={320} />
           <StatCard label="Signalées"       value={stats.totalFlaggedAnnonces || 0} color="#ec4899" icon="🚩" delay={400} />
+          <StatCard label="Chiffre d'Affaires" value={stats.chiffreAffaireTotal || 0} color="#eab308" icon="💰" delay={480} />
+          <StatCard label="Taux de Conv. (%)" value={stats.tauxConversion || 0} color="#3b82f6" icon="📈" delay={560} />
         </div>
 
         {/* Charts */}
@@ -175,6 +177,21 @@ export default function AdminDashboard() {
             <div className="chart-wrap">
               <Pie data={{ labels: ['Actifs', 'Bannis'], datasets: [{ data: [stats.totalActive || 0, stats.totalBanned || 0], backgroundColor: ['rgba(16,185,129,0.7)', 'rgba(239,68,68,0.7)'], borderColor: ['#10b981', '#ef4444'], borderWidth: 2 }] }}
                 options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } } } }} />
+            </div>
+          </div>
+          <div className="chart-card">
+            <h3>📦 Répartition Commandes</h3>
+            <div className="chart-wrap">
+              <Pie data={{ 
+                  labels: stats.ventesParStatut?.map(s => s.statut) || ['Aucune'], 
+                  datasets: [{ 
+                    data: stats.ventesParStatut?.map(s => s.count) || [0], 
+                    backgroundColor: ['rgba(249,115,22,0.7)', 'rgba(59,130,246,0.7)', 'rgba(16,185,129,0.7)', 'rgba(239,68,68,0.7)'], 
+                    borderColor: ['#ea580c', '#2563eb', '#10b981', '#dc2626'], 
+                    borderWidth: 2 
+                  }] 
+                }}
+                options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } } }, cutout: '60%' }} />
             </div>
           </div>
         </div>
@@ -197,6 +214,31 @@ export default function AdminDashboard() {
                         <button onClick={() => handleApproveAnnonce(a.id)} className="btn-approve">Approuver</button>
                         <button onClick={() => handleDeleteAnnonce(a.id)} className="btn-delete">Supprimer</button>
                       </div></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Top Vendeurs */}
+        {stats.topVendeurs && stats.topVendeurs.length > 0 && (
+          <div className="section-card" style={{ marginBottom:'30px' }}>
+            <h2>🏆 Top Vendeurs (Performances)</h2>
+            <div className="table-responsive">
+              <table className="admin-table">
+                <thead><tr><th>Vendeur</th><th>Email</th><th>Total Ventes</th><th>Gains Générés (DH)</th></tr></thead>
+                <tbody>
+                  {stats.topVendeurs.map((v, i) => (
+                    <tr key={v.id}>
+                      <td style={{ fontWeight: 700 }}>
+                        {i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : ''}
+                        {v.nom}
+                      </td>
+                      <td style={{ color:'var(--text-secondary)' }}>{v.email}</td>
+                      <td>{v.totalVentes} commandes</td>
+                      <td style={{ color: '#10b981', fontWeight: 900 }}>{v.totalRevenus.toFixed(2)} DH</td>
                     </tr>
                   ))}
                 </tbody>
