@@ -6,7 +6,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-// ─── GET: Obtenir toutes les annonces (avec filtres et recherche) ──────────
+// ─── GET: Obtenir toutes les annonces (avec filtres et recherche ───────
 router.get('/', async (req, res) => {
   try {
     const { search, categorie, minPrix, maxPrix, etat } = req.query;
