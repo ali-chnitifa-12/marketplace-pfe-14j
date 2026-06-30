@@ -130,4 +130,52 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// Récupérer les enchères reçues (pour le vendeur)
+router.get('/recues', authMiddleware, async (req, res) => {
+  try {
+    const annonces = await Annonce.findAll({ where: { userId: req.user.id }, attributes: ['id'] });
+    const annonceIds = annonces.map(a => a.id);
+    const encheres = await Enchere.findAll({
+      where: { annonceId: annonceIds },
+      include: [
+        { model: User, as: 'enchrisseur', attributes: ['id', 'nom', 'telephone', 'email'] },
+        { model: Annonce, attributes: ['id', 'titre', 'prix', 'statut'] }
+      ]
+    });
+    res.json(encheres);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur' });
+  }
+});
+
+// Accepter une enchère et créer la commande correspondante
+router.post('/:id/accepter', authMiddleware, async (req, res) => {
+  try {
+    const enchere = await Enchere.findByPk(req.params.id, { include: [Annonce] });
+    if (!enchere) return res.status(404).json({ message: 'Enchère introuvable' });
+    if (enchere.Annonce.userId !== req.user.id) return res.status(403).json({ message: 'Non autorisé' });
+    if (enchere.Annonce.statut !== 'Disponible') return res.status(400).json({ message: 'Annonce non disponible' });
+
+    // Créer la commande
+    const commande = await Commande.create({
+      annonceId: enchere.annonceId,
+      acheteurId: enchere.enchrisseurId,
+      adresseLivraison: '',
+      telephone: '',
+      modeLivraison: 'Domicile',
+      prixTotal: enchere.montant,
+      statut: 'En attente'
+    });
+
+    // Mettre à jour le statut de l'annonce
+    await enchere.Annonce.update({ statut: 'Vendu' });
+
+    res.json({ commande, message: 'Enchère acceptée et commande créée' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur' });
+  }
+});
+
 module.exports = router;
