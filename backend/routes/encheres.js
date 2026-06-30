@@ -4,6 +4,7 @@ const Enchere = require('../models/Enchere');
 const Annonce = require('../models/Annonce');
 const User = require('../models/User');
 const authMiddleware = require('../middlewares/authMiddleware');
+const Commande = require('../models/Commande');
 
 const router = express.Router();
 

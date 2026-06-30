@@ -137,6 +137,13 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     const { titre, description, prix, etat, categorie, images, statut } = req.body;
     
+    // Perform anti-spam check on edit
+    const forbiddenWords = ['arnaque', 'insulte', 'faux', 'escroc'];
+    const titleToCheck = titre !== undefined ? titre : annonce.titre;
+    const descToCheck = description !== undefined ? description : annonce.description;
+    const textToCheck = (titleToCheck + ' ' + descToCheck).toLowerCase();
+    const isFlagged = forbiddenWords.some(word => textToCheck.includes(word));
+    
     await annonce.update({
       titre: titre || annonce.titre,
       description: description || annonce.description,
@@ -144,7 +151,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
       etat: etat || annonce.etat,
       categorie: categorie || annonce.categorie,
       images: images || annonce.images,
-      statut: statut || annonce.statut
+      statut: statut || annonce.statut,
+      isFlagged: isFlagged
     });
 
     res.json(annonce);
