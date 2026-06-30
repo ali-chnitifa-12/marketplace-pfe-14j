@@ -260,7 +260,7 @@ export default function CreateAnnonce() {
         .form-group label { display:block; font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.07em; }
         .form-group input,.form-group textarea,.form-group select { width:100%; background:var(--input-bg); border:1px solid var(--input-border); border-radius:12px; padding:13px 15px; color:var(--text-primary); font-size:14.5px; font-family:'Inter',sans-serif; transition:all 0.3s; outline:none; }
         .form-group input:focus,.form-group textarea:focus,.form-group select:focus { border-color:rgba(249,115,22,0.5); background:var(--input-focus-bg); box-shadow:0 0 0 3px rgba(249,115,22,0.1); }
-        .form-group select { appearance:none; cursor:pointer; }
+        .form-group select { cursor:pointer; }
         .help-text { display:block; margin-top:6px; font-size:11px; color:var(--text-secondary); }
 
         .etat-selector { display:flex; flex-wrap:wrap; gap:8px; }

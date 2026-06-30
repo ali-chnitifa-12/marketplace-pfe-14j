@@ -13,6 +13,21 @@ export default function Profile() {
   const [mesCommandes, setMesCommandes] = useState([]);
   const [commandesRecues, setCommandesRecues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [offresEnvoyees, setOffresEnvoyees] = useState([]);
+  const [mesEncheres, setMesEncheres] = useState([]);
+  const [editingOffreId, setEditingOffreId] = useState(null);
+  const [editOffrePrix, setEditOffrePrix] = useState('');
+  const [editingEnchereId, setEditingEnchereId] = useState(null);
+  const [editEnchereMontant, setEditEnchereMontant] = useState('');
+
+  // Ad CRUD states
+  const [editingAnnonceId, setEditingAnnonceId] = useState(null);
+  const [editTitre, setEditTitre] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editPrix, setEditPrix] = useState('');
+  const [editCategorie, setEditCategorie] = useState('');
+  const [editEtat, setEditEtat] = useState('');
+  const [editStatut, setEditStatut] = useState('');
 
   // Form states
   const [nom, setNom] = useState(user?.nom || '');
@@ -34,6 +49,12 @@ export default function Profile() {
 
       const resCmd = await axios.get('http://localhost:5000/api/commandes/mes-achats', { headers });
       setMesCommandes(resCmd.data);
+
+      const resOffresEnv = await axios.get('http://localhost:5000/api/offres/emises', { headers });
+      setOffresEnvoyees(resOffresEnv.data);
+
+      const resEncheres = await axios.get('http://localhost:5000/api/encheres/mes-encheres', { headers });
+      setMesEncheres(resEncheres.data);
       
       if (user?.typeCompte === 'vendeur') {
         const resAnn = await axios.get(`http://localhost:5000/api/annonces?userId=${user.id}`);
@@ -83,6 +104,102 @@ export default function Profile() {
     }
   };
 
+  const handleUpdateOffre = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/offres/${id}`, { prixPropose: parseFloat(editOffrePrix) }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setEditingOffreId(null);
+      fetchData(); // Refresh
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur lors de la modification');
+    }
+  };
+
+  const handleDeleteOffre = async (id) => {
+    if (!window.confirm("Annuler cette offre définitivement ?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/offres/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchData(); // Refresh
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur lors de l\'annulation');
+    }
+  };
+
+  const handleUpdateEnchere = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/encheres/${id}`, { montant: parseFloat(editEnchereMontant) }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setEditingEnchereId(null);
+      fetchData(); // Refresh
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur lors de la modification');
+    }
+  };
+
+  const handleDeleteEnchere = async (id) => {
+    if (!window.confirm("Retirer votre enchère ?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/encheres/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchData(); // Refresh
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erreur lors de l\'annulation');
+    }
+  };
+
+  const handleStartEditAnnonce = (a) => {
+    setEditingAnnonceId(a.id);
+    setEditTitre(a.titre);
+    setEditDescription(a.description);
+    setEditPrix(a.prix);
+    setEditCategorie(a.categorie);
+    setEditEtat(a.etat);
+    setEditStatut(a.statut);
+  };
+
+  const handleUpdateAnnonce = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/annonces/${editingAnnonceId}`, {
+        titre: editTitre,
+        description: editDescription,
+        prix: parseFloat(editPrix),
+        categorie: editCategorie,
+        etat: editEtat,
+        statut: editStatut
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setEditingAnnonceId(null);
+      fetchData(); // Refresh
+    } catch (err) {
+      alert(err.response?.data?.message || "Erreur lors de la modification de l'annonce");
+    }
+  };
+
+  const handleDeleteAnnonce = async (id) => {
+    if (!window.confirm("Supprimer cette annonce définitivement ?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/annonces/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchData(); // Refresh
+    } catch (err) {
+      alert(err.response?.data?.message || "Erreur lors de la suppression de l'annonce");
+    }
+  };
+
   const handleUpdateCommandeStatut = async (id, statut) => {
     try {
       const token = localStorage.getItem('token');
@@ -125,6 +242,8 @@ export default function Profile() {
           <button className={activeTab === 'infos' ? 'active' : ''} onClick={() => setActiveTab('infos')}>Mes Infos</button>
           <button className={activeTab === 'favoris' ? 'active' : ''} onClick={() => setActiveTab('favoris')}>Mes Favoris</button>
           <button className={activeTab === 'achats' ? 'active' : ''} onClick={() => setActiveTab('achats')}>Mes Achats</button>
+          <button className={activeTab === 'offresEnvoyees' ? 'active' : ''} onClick={() => setActiveTab('offresEnvoyees')}>Offres Envoyées</button>
+          <button className={activeTab === 'mesEncheres' ? 'active' : ''} onClick={() => setActiveTab('mesEncheres')}>Mes Enchères</button>
           {user?.typeCompte === 'vendeur' && (
             <>
               <button className={activeTab === 'annonces' ? 'active' : ''} onClick={() => setActiveTab('annonces')}>Mes Annonces</button>
@@ -183,14 +302,28 @@ export default function Profile() {
               <h2>Gérer mes annonces</h2>
               <div className="grid-list">
                 {mesAnnonces.map(a => (
-                  <Link to={`/annonce/${a.id}`} key={a.id} className="mini-card">
-                    <img src={a.images[0] || 'https://via.placeholder.com/150'} alt="" />
+                  <div key={a.id} className="mini-card">
+                    <Link to={`/annonce/${a.id}`}>
+                      <img src={a.images[0] || 'https://via.placeholder.com/150'} alt="" />
+                    </Link>
                     <div className="mini-card-info">
-                      <h4>{a.titre}</h4>
-                      <p className="price">{a.prix} DH</p>
-                      <span className={`statut ${a.statut.toLowerCase()}`}>{a.statut}</span>
+                      <Link to={`/annonce/${a.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <h4 style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.titre}</h4>
+                      </Link>
+                      <p className="price" style={{ margin: '5px 0' }}>{a.prix} DH</p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '5px', marginTop: '5px' }}>
+                        <span className={`statut ${a.statut.toLowerCase()}`}>{a.statut}</span>
+                        <span className="statut" style={{ background: 'rgba(20,184,166,0.1)', color: '#14b8a6', border: '1px solid rgba(20,184,166,0.2)' }}>
+                          {a.typeAnnonce === 'Enchere' ? '🔨 Enchère' : '💰 Fixe'}
+                        </span>
+                      </div>
+                      
+                      <div className="annonce-card-actions" style={{ display: 'flex', gap: '8px', marginTop: '12px', borderTop: '1px solid var(--card-border)', paddingTop: '8px' }}>
+                        <button onClick={() => handleStartEditAnnonce(a)} className="btn-accept" style={{ padding: '6px 8px', fontSize: '12px', flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>✏️ Modifier</button>
+                        <button onClick={() => handleDeleteAnnonce(a.id)} className="btn-reject" style={{ padding: '6px 8px', fontSize: '12px', flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🗑️ Supprimer</button>
+                      </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
@@ -288,6 +421,171 @@ export default function Profile() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'offresEnvoyees' && (
+            <div className="offres-tab">
+              <h2>Vos offres envoyées</h2>
+              {offresEnvoyees.length === 0 ? <p>Aucune offre envoyée pour le moment.</p> : (
+                <div className="offres-list">
+                  {offresEnvoyees.map(o => (
+                    <div key={o.id} className="offre-item">
+                      <div className="offre-details">
+                        <h4>Annonce : {o.annonce?.titre}</h4>
+                        <p className="offre-prix">
+                          Prix proposé : <strong>{o.prixPropose} DH</strong> (Original : {o.annonce?.prix} DH)
+                        </p>
+                        {o.statut === 'Acceptée' && o.annonce?.User && (
+                          <div className="seller-contact-info" style={{ marginTop: '10px', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <p style={{ margin: 0 }}>👤 Vendeur : <strong>{o.annonce.User.nom}</strong> {o.annonce.User.telephone && `• 📞 ${o.annonce.User.telephone}`}</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="offre-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
+                        <span className={`badge ${o.statut.toLowerCase()}`}>{o.statut}</span>
+                        
+                        {o.statut === 'En attente' && (
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {editingOffreId === o.id ? (
+                              <>
+                                <input 
+                                  type="number" 
+                                  value={editOffrePrix} 
+                                  onChange={e => setEditOffrePrix(e.target.value)} 
+                                  style={{ width: '80px', padding: '4px', borderRadius: '4px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }} 
+                                />
+                                <button onClick={() => handleUpdateOffre(o.id)} className="btn-accept" style={{ padding: '4px 8px' }}>Sauver</button>
+                                <button onClick={() => setEditingOffreId(null)} className="btn-reject" style={{ padding: '4px 8px' }}>X</button>
+                              </>
+                            ) : (
+                              <>
+                                <button onClick={() => { setEditingOffreId(o.id); setEditOffrePrix(o.prixPropose); }} className="btn-accept" style={{ padding: '6px 12px', fontSize: '12px' }}>Modifier</button>
+                                <button onClick={() => handleDeleteOffre(o.id)} className="btn-reject" style={{ padding: '6px 12px', fontSize: '12px' }}>Annuler</button>
+                              </>
+                            )}
+                          </div>
+                        )}
+
+                        {o.statut === 'Acceptée' && o.annonce?.User?.telephone && (
+                          <a 
+                            href={`https://wa.me/${o.annonce.User.telephone.replace(/[^0-9]/g, '')}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="btn-whatsapp-small"
+                          >
+                            Contacter Vendeur
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'mesEncheres' && (
+            <div className="offres-tab">
+              <h2>Vos enchères placées</h2>
+              {mesEncheres.length === 0 ? <p>Aucune enchère placée pour le moment.</p> : (
+                <div className="offres-list">
+                  {mesEncheres.map(e => (
+                    <div key={e.id} className="offre-item">
+                      <div className="offre-details">
+                        <h4>Annonce : {e.Annonce?.titre}</h4>
+                        <p className="offre-prix">
+                          Votre enchère : <strong>{e.montant} DH</strong> (Prix départ : {e.Annonce?.prix} DH)
+                        </p>
+                      </div>
+                      <div className="offre-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
+                        <span className={`badge ${e.Annonce?.statut === 'Disponible' ? 'acceptée' : 'refusée'}`}>
+                          {e.Annonce?.statut === 'Disponible' ? 'En Cours' : 'Terminée'}
+                        </span>
+                        
+                        {e.Annonce?.statut === 'Disponible' && (
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {editingEnchereId === e.id ? (
+                              <>
+                                <input 
+                                  type="number" 
+                                  value={editEnchereMontant} 
+                                  onChange={e => setEditEnchereMontant(e.target.value)} 
+                                  style={{ width: '80px', padding: '4px', borderRadius: '4px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }} 
+                                />
+                                <button onClick={() => handleUpdateEnchere(e.id)} className="btn-accept" style={{ padding: '4px 8px' }}>Miser</button>
+                                <button onClick={() => setEditingEnchereId(null)} className="btn-reject" style={{ padding: '4px 8px' }}>X</button>
+                              </>
+                            ) : (
+                              <>
+                                <button onClick={() => { setEditingEnchereId(e.id); setEditEnchereMontant(e.montant); }} className="btn-accept" style={{ padding: '6px 12px', fontSize: '12px' }}>Surenchérir</button>
+                                <button onClick={() => handleDeleteEnchere(e.id)} className="btn-reject" style={{ padding: '6px 12px', fontSize: '12px' }}>Retirer</button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {editingAnnonceId && (
+            <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+              <div className="modal-content glass-card" style={{ maxWidth: '500px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
+                <h2 style={{ marginBottom: '15px' }}>✏️ Modifier l'annonce</h2>
+                <form onSubmit={handleUpdateAnnonce} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <div className="form-group">
+                    <label>Titre de l'annonce</label>
+                    <input type="text" value={editTitre} onChange={e => setEditTitre(e.target.value)} required style={{ width: '100%', background: 'var(--input-bg)', border: '1px solid var(--input-border)', padding: '12px 16px', borderRadius: '10px', color: 'var(--text-primary)', outline: 'none' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label>Prix (DH)</label>
+                      <input type="number" value={editPrix} onChange={e => setEditPrix(e.target.value)} required min="0" step="0.01" style={{ width: '100%', background: 'var(--input-bg)', border: '1px solid var(--input-border)', padding: '12px 16px', borderRadius: '10px', color: 'var(--text-primary)', outline: 'none' }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label>Statut</label>
+                      <select value={editStatut} onChange={e => setEditStatut(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', outline: 'none' }}>
+                        <option value="Disponible">Disponible</option>
+                        <option value="Vendu">Vendu</option>
+                        <option value="Annulé">Annulé</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label>Catégorie</label>
+                      <select value={editCategorie} onChange={e => setEditCategorie(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', outline: 'none' }}>
+                        <option value="Électronique">📱 Électronique</option>
+                        <option value="Vêtements">👕 Vêtements</option>
+                        <option value="Maison">🏠 Maison & Déco</option>
+                        <option value="Véhicules">🚗 Véhicules</option>
+                        <option value="Services">🔧 Services</option>
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label>État du produit</label>
+                      <select value={editEtat} onChange={e => setEditEtat(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', outline: 'none' }}>
+                        <option value="Neuf">Neuf</option>
+                        <option value="Très bon état">Très bon état</option>
+                        <option value="Bon état">Bon état</option>
+                        <option value="Satisfaisant">Satisfaisant</option>
+                        <option value="Pour pièces">Pour pièces</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} required rows="4" style={{ width: '100%', padding: '12px', borderRadius: '10px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', outline: 'none', resize: 'vertical' }} />
+                  </div>
+                  <div className="modal-actions" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button type="button" onClick={() => setEditingAnnonceId(null)} className="btn-reject" style={{ flex: 1, padding: '12px', cursor: 'pointer' }}>Annuler</button>
+                    <button type="submit" className="btn-primary" style={{ flex: 1, padding: '12px', cursor: 'pointer' }}>Enregistrer</button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
 

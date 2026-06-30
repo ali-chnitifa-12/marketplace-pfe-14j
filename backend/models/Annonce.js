@@ -39,21 +39,25 @@ const Annonce = sequelize.define('Annonce', {
     allowNull: true,
     defaultValue: [],
     get() {
-      const rawValue = this.getDataValue('images');
-      if (typeof rawValue === 'string') {
+      let value = this.getDataValue('images');
+      while (typeof value === 'string') {
         try {
-          return JSON.parse(rawValue);
-        } catch(e) {
-          return [];
+          value = JSON.parse(value);
+        } catch (e) {
+          break;
         }
       }
-      return rawValue || [];
+      return Array.isArray(value) ? value : [];
     },
     set(val) {
       if (typeof val === 'string') {
-        this.setDataValue('images', val);
+        try {
+          this.setDataValue('images', JSON.parse(val));
+        } catch (e) {
+          this.setDataValue('images', val);
+        }
       } else {
-        this.setDataValue('images', JSON.stringify(val));
+        this.setDataValue('images', val);
       }
     }
   },

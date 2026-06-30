@@ -1,4 +1,5 @@
 const express = require('express');
+const { Op } = require('sequelize');
 const Enchere = require('../models/Enchere');
 const Annonce = require('../models/Annonce');
 const User = require('../models/User');
@@ -59,6 +60,72 @@ router.get('/annonce/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erreur' });
+  }
+});
+
+// Récupérer les enchères de l'utilisateur connecté
+router.get('/mes-encheres', authMiddleware, async (req, res) => {
+  try {
+    const encheres = await Enchere.findAll({
+      where: { enchrisseurId: req.user.id },
+      include: [{
+        model: Annonce,
+        attributes: ['id', 'titre', 'prix', 'images', 'statut'],
+        include: [{ model: User, attributes: ['id', 'nom', 'telephone'] }]
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(encheres);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la récupération de vos enchères' });
+  }
+});
+
+// Modifier le montant d'une enchère (doit être supérieur à l'enchère la plus haute, hors celle-ci)
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { montant } = req.body;
+    const enchere = await Enchere.findByPk(req.params.id, { include: [Annonce] });
+    if (!enchere) return res.status(404).json({ message: 'Enchère introuvable' });
+    if (enchere.enchrisseurId !== req.user.id) return res.status(403).json({ message: 'Non autorisé' });
+    if (enchere.Annonce.statut !== 'Disponible') return res.status(400).json({ message: 'L\'annonce n\'est plus active' });
+
+    // Trouver le montant maximum actuel en excluant cette ligne
+    const highestBid = await Enchere.max('montant', { 
+      where: { 
+        annonceId: enchere.annonceId,
+        id: { [Op.ne]: enchere.id }
+      } 
+    });
+    const currentPrice = highestBid ? highestBid : enchere.Annonce.prix;
+
+    if (montant <= currentPrice) {
+      return res.status(400).json({ message: `Le montant doit être supérieur à ${currentPrice} DH` });
+    }
+
+    enchere.montant = montant;
+    await   enchere.save();
+    res.json(enchere);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la modification de l\'enchère' });
+  }
+});
+
+// Supprimer/Annuler une enchère
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const enchere = await Enchere.findByPk(req.params.id, { include: [Annonce] });
+    if (!enchere) return res.status(404).json({ message: 'Enchère introuvable' });
+    if (enchere.enchrisseurId !== req.user.id) return res.status(403).json({ message: 'Non autorisé' });
+    if (enchere.Annonce.statut !== 'Disponible') return res.status(400).json({ message: 'L\'annonce n\'est plus active' });
+
+    await enchere.destroy();
+    res.json({ message: 'Enchère annulée avec succès' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la suppression de l\'enchère' });
   }
 });
 
