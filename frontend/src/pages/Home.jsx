@@ -52,7 +52,7 @@ export default function Home() {
     fetchAnnonces();
   }, [search, categorie, minPrix, maxPrix]);
 
-  // Animate cards when they appear
+  // Animate cards when they appear...
   useEffect(() => {
     if (!loading && annonces.length > 0 && cardsRef.current.length > 0) {
       gsap.fromTo(
